@@ -1,3 +1,5 @@
+import 'package:file_selector/file_selector.dart';
+
 /// Selects files and directories from the host operating system.
 ///
 /// The concrete implementation is platform specific; the contract keeps the
@@ -13,19 +15,30 @@ abstract interface class FilePickerService {
   });
 }
 
-/// Default implementation backed by the host file system.
+/// [FilePickerService] backed by `file_selector`, which delegates to the
+/// native dialog of each desktop platform.
 ///
-/// Wiring to a native picker plugin lands in the next milestone; until then it
-/// resolves immediately with no selection so the UI remains usable.
+/// `file_selector` has no API for a dialog window title, so the `title`
+/// argument is forwarded as the confirm button label instead.
 final class NativeFilePickerService implements FilePickerService {
   const NativeFilePickerService();
 
   @override
-  Future<String?> pickDirectory({String? title}) async => null;
+  Future<String?> pickDirectory({String? title}) =>
+      getDirectoryPath(confirmButtonText: title);
 
   @override
   Future<String?> pickFile({
     String? title,
     List<String> allowedExtensions = const [],
-  }) async => null;
+  }) async {
+    final file = await openFile(
+      confirmButtonText: title,
+      acceptedTypeGroups: [
+        if (allowedExtensions.isNotEmpty)
+          XTypeGroup(label: 'Allowed files', extensions: allowedExtensions),
+      ],
+    );
+    return file?.path;
+  }
 }

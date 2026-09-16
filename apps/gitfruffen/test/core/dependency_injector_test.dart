@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:git_core/git_core.dart';
 import 'package:gitfruffen/core/di/dependency_injector.dart';
+import 'package:gitfruffen/core/services/file_picker_service.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
 import 'package:gitfruffen/features/settings/bloc/settings_bloc.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +36,10 @@ void main() {
     expect(capturedContext.read<GitObjectMapper>(), isA<GitObjectMapper>());
     // providers
     expect(capturedContext.read<GitDataSource>(), isNotNull);
+    expect(
+      capturedContext.read<FilePickerService>(),
+      isA<NativeFilePickerService>(),
+    );
     // repositories
     expect(
       capturedContext.read<GitRepositoryContract>(),

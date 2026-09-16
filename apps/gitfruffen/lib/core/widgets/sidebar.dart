@@ -114,16 +114,12 @@ class _RepositoryHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return BlocBuilder<RepositoryBloc, RepositoryState>(
-      buildWhen: (prev, next) => prev.runtimeType != next.runtimeType,
+      buildWhen: (prev, next) =>
+          prev.active != next.active || prev.runtimeType != next.runtimeType,
       builder: (context, state) {
-        final name = switch (state) {
-          RepositoryReady(:final repository) => repository.name,
-          _ => 'No repository',
-        };
-        final branch = switch (state) {
-          RepositoryReady(:final status) => status.currentBranchName ?? '-',
-          _ => '-',
-        };
+        final active = state.active;
+        final name = active?.repository.name ?? 'No repository';
+        final branch = active?.status.currentBranchName ?? '-';
 
         return Padding(
           padding: const EdgeInsets.all(16),

@@ -7,6 +7,9 @@ part of 'dependency_injector.dart';
 /// native engine.
 List<SingleChildWidget> _providers(SharedPreferences preferences) => [
   Provider<SharedPreferences>.value(value: preferences),
-  Provider<GitDataSource>(create: (_) => Libgit2GitDataSource()),
+  Provider<GitDataSource>(
+    create: (context) =>
+        Libgit2GitDataSource(mapper: context.read<GitObjectMapper>()),
+  ),
   Provider<FilePickerService>(create: (_) => const NativeFilePickerService()),
 ];

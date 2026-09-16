@@ -10,35 +10,48 @@ import '../bloc/history_event.dart';
 import '../bloc/history_state.dart';
 
 /// Commit log for the open repository.
-class HistoryPage extends StatelessWidget {
+class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      BlocListener<RepositoryBloc, RepositoryState>(
-        listenWhen: (prev, next) =>
-            next is RepositoryReady && prev is! RepositoryReady,
-        listener: (context, state) {
-          final ready = state as RepositoryReady;
-          context.read<HistoryBloc>().add(
-            HistoryLoaded(path: ready.repository.path),
-          );
-        },
-        child: BlocBuilder<HistoryBloc, HistoryState>(
-          builder: (context, state) => switch (state) {
-            HistoryInitial() => const AppEmptyState(
-              icon: Icons.account_tree_outlined,
-              title: 'No history loaded',
-              message: 'Open a repository to browse its commits.',
-            ),
-            HistoryLoading() => const AppLoading(),
-            HistoryError(:final failure) => AppErrorView(
-              message: failure.message,
-            ),
-            HistoryReady(:final commits) => _CommitList(commits: commits),
-          },
+  State<HistoryPage> createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final path = context.read<RepositoryBloc>().state.activePath;
+      if (path != null) {
+        context.read<HistoryBloc>().add(HistoryLoaded(path: path));
+      }
+    });
+  }
+
+  @override
+  Widget build(
+    BuildContext context,
+  ) => BlocListener<RepositoryBloc, RepositoryState>(
+    listenWhen: (prev, next) =>
+        next.activePath != null && prev.activePath != next.activePath,
+    listener: (context, state) {
+      context.read<HistoryBloc>().add(HistoryLoaded(path: state.activePath!));
+    },
+    child: BlocBuilder<HistoryBloc, HistoryState>(
+      builder: (context, state) => switch (state) {
+        HistoryInitial() => const AppEmptyState(
+          icon: Icons.account_tree_outlined,
+          title: 'No history loaded',
+          message: 'Open a repository to browse its commits.',
         ),
-      );
+        HistoryLoading() => const AppLoading(),
+        HistoryError(:final failure) => AppErrorView(message: failure.message),
+        HistoryReady(:final commits) => _CommitList(commits: commits),
+      },
+    ),
+  );
 }
 
 class _CommitList extends StatelessWidget {

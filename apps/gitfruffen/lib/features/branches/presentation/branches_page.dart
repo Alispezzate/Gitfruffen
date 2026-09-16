@@ -11,34 +11,48 @@ import '../bloc/branches_event.dart';
 import '../bloc/branches_state.dart';
 
 /// Local and remote branches of the open repository.
-class BranchesPage extends StatelessWidget {
+class BranchesPage extends StatefulWidget {
   const BranchesPage({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      BlocListener<RepositoryBloc, RepositoryState>(
-        listenWhen: (prev, next) => next is RepositoryReady,
-        listener: (context, state) {
-          final ready = state as RepositoryReady;
-          context.read<BranchesBloc>().add(
-            BranchesLoaded(path: ready.repository.path),
-          );
-        },
-        child: BlocBuilder<BranchesBloc, BranchesState>(
-          builder: (context, state) => switch (state) {
-            BranchesInitial() => const AppEmptyState(
-              icon: Icons.call_split_outlined,
-              title: 'No branches loaded',
-              message: 'Open a repository to list its branches.',
-            ),
-            BranchesLoading() => const AppLoading(),
-            BranchesError(:final failure) => AppErrorView(
-              message: failure.message,
-            ),
-            BranchesReady() => _BranchView(state: state),
-          },
+  State<BranchesPage> createState() => _BranchesPageState();
+}
+
+class _BranchesPageState extends State<BranchesPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final path = context.read<RepositoryBloc>().state.activePath;
+      if (path != null) {
+        context.read<BranchesBloc>().add(BranchesLoaded(path: path));
+      }
+    });
+  }
+
+  @override
+  Widget build(
+    BuildContext context,
+  ) => BlocListener<RepositoryBloc, RepositoryState>(
+    listenWhen: (prev, next) =>
+        next.activePath != null && prev.activePath != next.activePath,
+    listener: (context, state) {
+      context.read<BranchesBloc>().add(BranchesLoaded(path: state.activePath!));
+    },
+    child: BlocBuilder<BranchesBloc, BranchesState>(
+      builder: (context, state) => switch (state) {
+        BranchesInitial() => const AppEmptyState(
+          icon: Icons.call_split_outlined,
+          title: 'No branches loaded',
+          message: 'Open a repository to list its branches.',
         ),
-      );
+        BranchesLoading() => const AppLoading(),
+        BranchesError(:final failure) => AppErrorView(message: failure.message),
+        BranchesReady() => _BranchView(state: state),
+      },
+    ),
+  );
 }
 
 class _BranchView extends StatelessWidget {
@@ -49,9 +63,7 @@ class _BranchView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final repository = context.select(
-      (RepositoryBloc bloc) => bloc.state is RepositoryReady
-          ? (bloc.state as RepositoryReady).repository
-          : null,
+      (RepositoryBloc bloc) => bloc.state.active?.repository,
     );
 
     return ListView(

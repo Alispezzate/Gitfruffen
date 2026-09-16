@@ -43,13 +43,6 @@ final class GitObjectMapper {
     when: DateTime.fromMillisecondsSinceEpoch(signature.time * 1000),
   );
 
-  Branch toBranch(libgit2.Branch branch, {required BranchKind kind}) => Branch(
-    name: branch.name,
-    kind: kind,
-    isHead: branch.isHead,
-    targetOid: branch.target.sha,
-  );
-
   Tag toTag(libgit2.Tag tag) => Tag(
     name: tag.name,
     targetOid: tag.targetOid.sha,
@@ -57,8 +50,86 @@ final class GitObjectMapper {
     message: tag.message.isEmpty ? null : tag.message,
   );
 
-  Remote toRemote(libgit2.Remote remote) =>
-      Remote(name: remote.name, url: remote.url);
+  Remote toRemote(libgit2.Remote remote) => Remote(
+    name: remote.name,
+    url: remote.url,
+    pushUrl: remote.pushUrl.isEmpty ? null : remote.pushUrl,
+  );
+
+  /// Maps a single working-tree entry reported by libgit2.
+  ///
+  /// [flags] is the raw set of `git_status_t` values for one path. Ignored
+  /// entries are expected to be filtered out by the caller.
+  FileChange toFileChange(String path, Set<libgit2.GitStatus> flags) {
+    final conflicted = flags.contains(libgit2.GitStatus.conflicted);
+    final staged = flags.any(_isIndexFlag);
+    final unstaged = flags.any(_isWorkdirFlag);
+
+    return FileChange(
+      path: path,
+      type: _changeType(flags),
+      staged: staged,
+      unstaged: unstaged,
+      conflicted: conflicted,
+    );
+  }
+
+  /// Maps the raw status map returned by libgit2 into a domain [RepositoryStatus].
+  ///
+  /// Ignored entries are dropped: they are never shown as working-tree changes.
+  RepositoryStatus toStatus({
+    required String? branchName,
+    required Commit? headCommit,
+    required Map<String, Set<libgit2.GitStatus>> rawStatus,
+  }) => RepositoryStatus(
+    currentBranchName: branchName,
+    headCommit: headCommit,
+    changes: [
+      for (final entry in rawStatus.entries)
+        if (!entry.value.contains(libgit2.GitStatus.ignored))
+          toFileChange(entry.key, entry.value),
+    ],
+  );
+
+  bool _isIndexFlag(libgit2.GitStatus status) => switch (status) {
+    libgit2.GitStatus.indexNew ||
+    libgit2.GitStatus.indexModified ||
+    libgit2.GitStatus.indexDeleted ||
+    libgit2.GitStatus.indexRenamed ||
+    libgit2.GitStatus.indexTypeChange => true,
+    _ => false,
+  };
+
+  bool _isWorkdirFlag(libgit2.GitStatus status) => switch (status) {
+    libgit2.GitStatus.wtNew ||
+    libgit2.GitStatus.wtModified ||
+    libgit2.GitStatus.wtDeleted ||
+    libgit2.GitStatus.wtTypeChange ||
+    libgit2.GitStatus.wtRenamed ||
+    libgit2.GitStatus.wtUnreadable => true,
+    _ => false,
+  };
+
+  FileChangeType _changeType(Set<libgit2.GitStatus> flags) {
+    if (flags.contains(libgit2.GitStatus.conflicted)) {
+      return FileChangeType.conflicted;
+    }
+    if (flags.contains(libgit2.GitStatus.indexRenamed) ||
+        flags.contains(libgit2.GitStatus.wtRenamed)) {
+      return FileChangeType.renamed;
+    }
+    if (flags.contains(libgit2.GitStatus.indexDeleted) ||
+        flags.contains(libgit2.GitStatus.wtDeleted)) {
+      return FileChangeType.deleted;
+    }
+    if (flags.contains(libgit2.GitStatus.indexNew)) {
+      return FileChangeType.added;
+    }
+    if (flags.contains(libgit2.GitStatus.wtNew)) {
+      return FileChangeType.untracked;
+    }
+    return FileChangeType.modified;
+  }
 
   /// Maps any engine error to a typed [GitFailure].
   GitFailure toFailure(Object error, [StackTrace? stackTrace]) =>
@@ -67,7 +138,7 @@ final class GitObjectMapper {
           error.message,
           cause: error,
         ),
-        _ => UnexpectedGitFailure('Unexpected Git error', cause: error),
+        _ => UnexpectedGitFailure('$error', cause: error),
       };
 
   String _repoName(String path) =>

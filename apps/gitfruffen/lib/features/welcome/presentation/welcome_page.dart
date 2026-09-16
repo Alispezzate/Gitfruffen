@@ -17,8 +17,18 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     body: BlocListener<RepositoryBloc, RepositoryState>(
-      listenWhen: (prev, next) => next is RepositoryReady,
-      listener: (context, state) => context.go('/repository'),
+      listenWhen: (prev, next) =>
+          (next.activePath != null && prev.activePath != next.activePath) ||
+          next is RepositoryError,
+      listener: (context, state) {
+        if (state is RepositoryError) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.failure.message)));
+          return;
+        }
+        context.go('/repository');
+      },
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 720),

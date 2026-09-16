@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   equatable: ^2.0.7
+  file_selector: ^1.1.0
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1

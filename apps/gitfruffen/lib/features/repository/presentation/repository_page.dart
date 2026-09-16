@@ -15,9 +15,16 @@ class RepositoryPage extends StatelessWidget {
   const RepositoryPage({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      BlocBuilder<RepositoryBloc, RepositoryState>(
-        builder: (context, state) => switch (state) {
+  Widget build(
+    BuildContext context,
+  ) => BlocBuilder<RepositoryBloc, RepositoryState>(
+    buildWhen: (previous, next) =>
+        previous.active != next.active ||
+        previous.runtimeType != next.runtimeType,
+    builder: (context, state) {
+      final active = state.active;
+      if (active == null) {
+        return switch (state) {
           RepositoryInitial() => const AppEmptyState(
             icon: Icons.folder_off_outlined,
             title: 'No repository open',
@@ -29,12 +36,15 @@ class RepositoryPage extends StatelessWidget {
             onRetry: () =>
                 context.read<RepositoryBloc>().add(const RepositoryRefreshed()),
           ),
-          RepositoryReady(:final repository, :final status) => _StatusView(
-            repository: repository,
-            status: status,
+          RepositoryReady() => const AppEmptyState(
+            icon: Icons.folder_off_outlined,
+            title: 'No repository open',
           ),
-        },
-      );
+        };
+      }
+      return _StatusView(repository: active.repository, status: active.status);
+    },
+  );
 }
 
 class _StatusView extends StatelessWidget {

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:git2dart/git2dart.dart' as libgit2;
 import 'package:git_core/git_core.dart';
 
 void main() {
@@ -47,6 +48,83 @@ void main() {
       expect(status.unstagedCount, 1);
       expect(status.conflictedCount, 1);
       expect(status.isClean, isFalse);
+    });
+  });
+
+  group('GitObjectMapper.toFileChange', () {
+    const mapper = GitObjectMapper();
+
+    test('maps a staged addition', () {
+      final change = mapper.toFileChange('a.dart', {
+        libgit2.GitStatus.indexNew,
+      });
+
+      expect(change.type, FileChangeType.added);
+      expect(change.staged, isTrue);
+      expect(change.unstaged, isFalse);
+    });
+
+    test('maps an untracked file', () {
+      final change = mapper.toFileChange('a.dart', {libgit2.GitStatus.wtNew});
+
+      expect(change.type, FileChangeType.untracked);
+      expect(change.unstaged, isTrue);
+    });
+
+    test('maps a working-tree modification as modified', () {
+      final change = mapper.toFileChange('a.dart', {
+        libgit2.GitStatus.wtModified,
+      });
+
+      expect(change.type, FileChangeType.modified);
+      expect(change.staged, isFalse);
+      expect(change.unstaged, isTrue);
+    });
+
+    test('prioritises conflict over everything else', () {
+      final change = mapper.toFileChange('a.dart', {
+        libgit2.GitStatus.conflicted,
+        libgit2.GitStatus.indexModified,
+      });
+
+      expect(change.type, FileChangeType.conflicted);
+      expect(change.conflicted, isTrue);
+    });
+
+    test('maps a rename', () {
+      final change = mapper.toFileChange('a.dart', {
+        libgit2.GitStatus.indexRenamed,
+      });
+
+      expect(change.type, FileChangeType.renamed);
+      expect(change.staged, isTrue);
+    });
+
+    test('maps a deletion', () {
+      final change = mapper.toFileChange('a.dart', {
+        libgit2.GitStatus.wtDeleted,
+      });
+
+      expect(change.type, FileChangeType.deleted);
+    });
+  });
+
+  group('GitObjectMapper.toStatus', () {
+    const mapper = GitObjectMapper();
+
+    test('drops ignored entries', () {
+      final status = mapper.toStatus(
+        branchName: 'main',
+        headCommit: null,
+        rawStatus: {
+          'tracked.dart': {libgit2.GitStatus.wtModified},
+          'ignored.dart': {libgit2.GitStatus.ignored},
+        },
+      );
+
+      expect(status.currentBranchName, 'main');
+      expect(status.changes, hasLength(1));
+      expect(status.changes.single.path, 'tracked.dart');
     });
   });
 
