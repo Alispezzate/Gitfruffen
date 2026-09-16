@@ -1,0 +1,21 @@
+name: git_core
+description: Pure Git engine for Gitfruffen. Domain entities, repository contracts and a libgit2-backed datasource.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+  flutter: ">=3.35.0"
+
+dependencies:
+  equatable: ^2.0.7
+  flutter:
+    sdk: flutter
+  git2dart: ^0.5.6
+  meta: ^1.16.0
+  path: ^1.9.0
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter

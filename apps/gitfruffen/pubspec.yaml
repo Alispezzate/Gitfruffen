@@ -1,0 +1,31 @@
+name: gitfruffen
+description: A modern Git client for desktop, built with Flutter and the Pine architecture.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  equatable: ^2.0.7
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1
+  git_core:
+    path: ../../packages/git_core
+  go_router: ^16.0.0
+  path_provider: ^2.1.5
+  pine: ^1.0.4
+  provider: ^6.1.5
+  shared_preferences: ^2.5.3
+  window_manager: ^0.5.1
+
+dev_dependencies:
+  bloc_test: ^10.0.0
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true

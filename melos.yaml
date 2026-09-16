@@ -1,0 +1,48 @@
+name: gitfruffen_workspace
+repository: https://github.com/gitfruffen/gitfruffen
+
+packages:
+  - apps/**
+  - packages/**
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
+
+  version:
+    branch: main
+    linkToCommits: true
+
+  analyze:
+    ignore:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+
+scripts:
+  analyze:
+    description: Run static analysis on all packages.
+    run: melos exec -- dart analyze .
+
+  format:
+    description: Format all Dart sources.
+    run: melos exec -- dart format .
+
+  test:
+    description: Run tests on all packages.
+    run: melos exec --dir-exists=test -- flutter test
+
+  build:macos:
+    description: Build the macOS desktop app.
+    run: melos exec --scope=gitfruffen -- flutter build macos
+
+  build:windows:
+    description: Build the Windows desktop app.
+    run: melos exec --scope=gitfruffen -- flutter build windows
+
+  build:linux:
+    description: Build the Linux desktop app.
+    run: melos exec --scope=gitfruffen -- flutter build linux
+
+  gen:
+    description: Run code generation on all packages.
+    run: melos exec --depends-on=build_runner -- dart run build_runner build --delete-conflicting-outputs

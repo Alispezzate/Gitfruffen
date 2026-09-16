@@ -20,10 +20,10 @@ Gitfruffen uses the [Pine](https://pub.dev/packages/pine) architecture by
 `provider` for dependency injection with `flutter_bloc` for state management and
 injects dependencies top-down in four layers:
 
-1. **mappers** — convert data-layer objects into presentation entities.
-2. **providers** — services / datasources (libgit2 access, settings, file picker).
-3. **repositories** — abstractions over the data layer.
-4. **blocs** — application logic and state.
+1. **mappers** - convert data-layer objects into presentation entities.
+2. **providers** - services / datasources (libgit2 access, settings, file picker).
+3. **repositories** - abstractions over the data layer.
+4. **blocs** - application logic and state.
 
 Each layer may depend on the layers above it and is accessed through Provider's
 `context.read()` / `context.watch()`.
@@ -32,7 +32,7 @@ Each layer may depend on the layers above it and is accessed through Provider's
 
 Git operations are delegated to [`git2dart`](https://pub.dev/packages/git2dart)
 (FFI bindings to libgit2) and fully isolated inside `packages/git_core`. The UI
-never talks to libgit2 directly — it only deals with domain entities.
+never talks to libgit2 directly - it only deals with domain entities.
 
 ## Getting started
 
