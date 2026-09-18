@@ -249,6 +249,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.12.2"
+  strict:
+    dependency: "direct dev"
+    description:
+      name: strict
+      sha256: "23bc2d1c00afa1685324b547c9a63e42f312668e737d6096142258c383bcb456"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   string_scanner:
     dependency: transitive
     description:

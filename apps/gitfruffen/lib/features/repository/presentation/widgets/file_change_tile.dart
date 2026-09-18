@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:git_core/git_core.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import 'package:gitfruffen/core/theme/app_colors.dart';
+import 'package:gitfruffen/l10n/generated/app_localizations.dart';
 
 /// Renders a single working-tree change with its staging state.
 class FileChangeTile extends StatelessWidget {
-  const FileChangeTile({super.key, required this.change});
+  const FileChangeTile({required this.change, super.key});
 
   final FileChange change;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final color = _colorFor(change.type);
 
     return ListTile(
@@ -24,7 +26,7 @@ class FileChangeTile extends StatelessWidget {
       subtitle: change.oldPath == null
           ? null
           : Text(
-              'from ${change.oldPath}',
+              l10n.fileChangeFrom(change.oldPath!),
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall,
             ),
@@ -32,14 +34,14 @@ class FileChangeTile extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (change.staged)
-            const _Badge(label: 'staged', color: AppColors.added),
+            _Badge(label: l10n.badgeStaged, color: AppColors.added),
           if (change.unstaged) ...[
             const SizedBox(width: 6),
-            const _Badge(label: 'unstaged', color: AppColors.modified),
+            _Badge(label: l10n.badgeUnstaged, color: AppColors.modified),
           ],
           if (change.conflicted) ...[
             const SizedBox(width: 6),
-            const _Badge(label: 'conflict', color: AppColors.conflicted),
+            _Badge(label: l10n.badgeConflict, color: AppColors.conflicted),
           ],
         ],
       ),

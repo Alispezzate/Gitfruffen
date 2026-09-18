@@ -13,4 +13,9 @@ abstract interface class WorkspaceRepositoryContract {
   String get themeMode;
 
   Future<void> setThemeMode(String value);
+
+  /// Identifier of the preferred language (e.g. `system`, `en`, `it`).
+  String get languageCode;
+
+  Future<void> setLanguageCode(String value);
 }

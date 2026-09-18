@@ -25,6 +25,10 @@ abstract interface class GitRepositoryContract {
   Future<RepositoryStatus> status({required String path});
 
   /// Returns the commit log reachable from HEAD, newest first.
+  ///
+  /// When [from] is provided it is treated as an exclusive cursor: the log
+  /// starts after that commit, which makes paginated loading possible by
+  /// passing the last commit of the previous page.
   Future<List<Commit>> log({
     required String path,
     int limit = 100,

@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:git_core/src/domain/entities/commit.dart';
 import 'package:meta/meta.dart';
-
-import 'commit.dart';
 
 /// Whether a branch lives locally or on a remote.
 enum BranchKind { local, remote }

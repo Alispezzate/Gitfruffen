@@ -4,7 +4,7 @@ part of 'dependency_injector.dart';
 ///
 /// Abstractions consumed by the blocs. The blocs depend on the interfaces
 /// declared in `git_core`, never on their concrete implementations.
-List<RepositoryProvider> _repositories() => [
+List<RepositoryProvider<Object>> _repositories() => [
   RepositoryProvider<GitRepositoryContract>(
     create: (context) =>
         GitRepositoryImpl(dataSource: context.read<GitDataSource>()),

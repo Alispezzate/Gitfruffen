@@ -1,8 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:git_core/src/domain/entities/git_oid.dart';
+import 'package:git_core/src/domain/entities/signature.dart';
 import 'package:meta/meta.dart';
-
-import 'git_oid.dart';
-import 'signature.dart';
 
 /// A single commit in the repository graph.
 @immutable

@@ -1,4 +1,4 @@
-include: package:flutter_lints/flutter.yaml
+include: package:strict/analysis_options.yaml
 
 analyzer:
   language:
@@ -13,12 +13,7 @@ analyzer:
 
 linter:
   rules:
-    always_declare_return_types: true
     avoid_print: true
     prefer_single_quotes: true
-    prefer_final_locals: true
-    prefer_const_constructors: true
     require_trailing_commas: true
     sort_child_properties_last: true
-    unawaited_futures: true
-    use_super_parameters: true

@@ -124,16 +124,23 @@ final class Libgit2GitDataSource implements GitDataSource {
       _withRepository(path, (repository) => _logOf(repository, limit, from));
 
   List<Commit> _logOf(libgit2.Repository repository, int limit, GitOid? from) {
-    if (repository.isBranchUnborn && from == null) return const [];
+    if (repository.isBranchUnborn && from == null) {
+      return const [];
+    }
 
-    final start = from == null
-        ? repository.head.target
-        : repository[from.value];
     final walker = libgit2.RevWalk(repository);
     try {
       walker.sorting({libgit2.GitSort.time});
-      walker.push(start);
-      return walker.walk(limit: limit).map(_mapper.toCommit).toList();
+      if (from == null) {
+        walker.push(repository.head.target);
+        return walker.walk(limit: limit).map(_mapper.toCommit).toList();
+      }
+
+      // [from] is an exclusive cursor: walk one extra commit and drop it so
+      // the next page does not repeat the last commit of the previous one.
+      walker.push(repository[from.value]);
+      final commits = walker.walk(limit: limit + 1).map(_mapper.toCommit);
+      return commits.skip(1).toList();
     } finally {
       walker.free();
     }
@@ -197,7 +204,9 @@ final class Libgit2GitDataSource implements GitDataSource {
   }) {
     final reference = libgit2.Reference.lookup(repo: repository, name: name);
     try {
-      if (reference.type != libgit2.ReferenceType.direct) return null;
+      if (reference.type != libgit2.ReferenceType.direct) {
+        return null;
+      }
 
       final target = reference.target;
       if (kind == BranchKind.local) {
@@ -238,7 +247,9 @@ final class Libgit2GitDataSource implements GitDataSource {
     try {
       final upstream = branch.upstream;
       try {
-        if (upstream.type != libgit2.ReferenceType.direct) return base;
+        if (upstream.type != libgit2.ReferenceType.direct) {
+          return base;
+        }
         final counts = repository.aheadBehind(
           local: target,
           upstream: upstream.target,

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gitfruffen/app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
-
-import 'app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,7 +14,7 @@ Future<void> main() async {
       center: true,
       title: 'Gitfruffen',
     ),
-    () => windowManager.show(),
+    windowManager.show,
   );
 
   final preferences = await SharedPreferences.getInstance();

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:git_core/git_core.dart';
-
-import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/app_feedback.dart';
-import '../../repository/bloc/repository_bloc.dart';
-import '../../repository/bloc/repository_state.dart';
-import '../bloc/branches_bloc.dart';
-import '../bloc/branches_event.dart';
-import '../bloc/branches_state.dart';
+import 'package:gitfruffen/core/theme/app_colors.dart';
+import 'package:gitfruffen/core/widgets/app_feedback.dart';
+import 'package:gitfruffen/features/branches/bloc/branches_bloc.dart';
+import 'package:gitfruffen/features/branches/bloc/branches_event.dart';
+import 'package:gitfruffen/features/branches/bloc/branches_state.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
+import 'package:gitfruffen/l10n/generated/app_localizations.dart';
 
 /// Local and remote branches of the open repository.
 class BranchesPage extends StatefulWidget {
@@ -23,7 +23,9 @@ class _BranchesPageState extends State<BranchesPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       final path = context.read<RepositoryBloc>().state.activePath;
       if (path != null) {
         context.read<BranchesBloc>().add(BranchesLoaded(path: path));
@@ -32,27 +34,33 @@ class _BranchesPageState extends State<BranchesPage> {
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => BlocListener<RepositoryBloc, RepositoryState>(
-    listenWhen: (prev, next) =>
-        next.activePath != null && prev.activePath != next.activePath,
-    listener: (context, state) {
-      context.read<BranchesBloc>().add(BranchesLoaded(path: state.activePath!));
-    },
-    child: BlocBuilder<BranchesBloc, BranchesState>(
-      builder: (context, state) => switch (state) {
-        BranchesInitial() => const AppEmptyState(
-          icon: Icons.call_split_outlined,
-          title: 'No branches loaded',
-          message: 'Open a repository to list its branches.',
+  Widget build(BuildContext context) =>
+      BlocListener<RepositoryBloc, RepositoryState>(
+        listenWhen: (prev, next) =>
+            next.activePath != null && prev.activePath != next.activePath,
+        listener: (context, state) {
+          context.read<BranchesBloc>().add(
+            BranchesLoaded(path: state.activePath!),
+          );
+        },
+        child: BlocBuilder<BranchesBloc, BranchesState>(
+          builder: (context, state) {
+            final l10n = AppLocalizations.of(context);
+            return switch (state) {
+              BranchesInitial() => AppEmptyState(
+                icon: Icons.call_split_outlined,
+                title: l10n.emptyNoBranches,
+                message: l10n.emptyNoBranchesMessage,
+              ),
+              BranchesLoading() => const AppLoading(),
+              BranchesError(:final failure) => AppErrorView(
+                message: failure.message,
+              ),
+              BranchesReady() => _BranchView(state: state),
+            };
+          },
         ),
-        BranchesLoading() => const AppLoading(),
-        BranchesError(:final failure) => AppErrorView(message: failure.message),
-        BranchesReady() => _BranchView(state: state),
-      },
-    ),
-  );
+      );
 }
 
 class _BranchView extends StatelessWidget {
@@ -62,14 +70,18 @@ class _BranchView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final repository = context.select(
-      (RepositoryBloc bloc) => bloc.state.active?.repository,
+    final repository = context.select<RepositoryBloc, GitRepository?>(
+      (bloc) => bloc.state.active?.repository,
     );
+    final l10n = AppLocalizations.of(context);
 
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 8),
       children: [
-        _SectionHeader(title: 'Local', count: state.local.length),
+        _SectionHeader(
+          title: l10n.branchLocalSection,
+          count: state.local.length,
+        ),
         for (final branch in state.local)
           _BranchTile(
             branch: branch,
@@ -82,7 +94,10 @@ class _BranchView extends StatelessWidget {
                     ),
                   ),
           ),
-        _SectionHeader(title: 'Remote', count: state.remote.length),
+        _SectionHeader(
+          title: l10n.branchRemoteSection,
+          count: state.remote.length,
+        ),
         for (final branch in state.remote) _BranchTile(branch: branch),
       ],
     );
@@ -99,7 +114,7 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
     child: Text(
-      '$title · $count',
+      AppLocalizations.of(context).branchSectionTitle(title, count),
       style: Theme.of(context).textTheme.titleMedium,
     ),
   );
@@ -131,7 +146,10 @@ class _BranchTile extends StatelessWidget {
           : Text(branch.targetOid!, style: theme.textTheme.bodySmall),
       trailing: branch.isRemote || onCheckout == null
           ? null
-          : TextButton(onPressed: onCheckout, child: const Text('Checkout')),
+          : TextButton(
+              onPressed: onCheckout,
+              child: Text(AppLocalizations.of(context).checkoutButton),
+            ),
     );
   }
 }

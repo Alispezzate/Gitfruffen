@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'app_colors.dart';
-import 'app_typography.dart';
+import 'package:gitfruffen/core/theme/app_colors.dart';
+import 'package:gitfruffen/core/theme/app_typography.dart';
 
 /// Builds the light and dark [ThemeData] used across Gitfruffen.
 abstract final class AppTheme {

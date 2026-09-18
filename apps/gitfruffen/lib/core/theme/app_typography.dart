@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'app_colors.dart';
+import 'package:gitfruffen/core/theme/app_colors.dart';
 
 /// Typography scale for the app shell and content areas.
 abstract final class AppTypography {

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:gitfruffen/core/widgets/app_shell.dart';
+import 'package:gitfruffen/features/branches/presentation/branches_page.dart';
+import 'package:gitfruffen/features/history/presentation/history_page.dart';
+import 'package:gitfruffen/features/repository/presentation/repository_page.dart';
+import 'package:gitfruffen/features/settings/presentation/settings_page.dart';
+import 'package:gitfruffen/features/welcome/presentation/welcome_page.dart';
+import 'package:gitfruffen/l10n/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-
-import '../widgets/app_shell.dart';
-import '../../features/branches/presentation/branches_page.dart';
-import '../../features/history/presentation/history_page.dart';
-import '../../features/repository/presentation/repository_page.dart';
-import '../../features/settings/presentation/settings_page.dart';
-import '../../features/welcome/presentation/welcome_page.dart';
 
 /// Declarative routing table.
 ///
@@ -42,7 +42,12 @@ abstract final class AppRouter {
         ],
       ),
     ],
-    errorBuilder: (context, state) =>
-        Scaffold(body: Center(child: Text('Route not found: ${state.uri}'))),
+    errorBuilder: (context, state) => Scaffold(
+      body: Center(
+        child: Text(
+          AppLocalizations.of(context).routeNotFound(state.uri.toString()),
+        ),
+      ),
+    ),
   );
 }

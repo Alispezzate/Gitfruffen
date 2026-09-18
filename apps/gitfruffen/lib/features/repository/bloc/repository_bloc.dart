@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:git_core/git_core.dart';
 
-import 'repository_event.dart';
-import 'repository_state.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_event.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
 
 /// Owns the lifecycle of every repository opened in a tab.
 ///
@@ -97,7 +97,9 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
     Emitter<RepositoryState> emit,
   ) {
     final tab = _existingTab(event.path);
-    if (tab == null || tab.repository.path == state.activePath) return;
+    if (tab == null || tab.repository.path == state.activePath) {
+      return;
+    }
     emit(RepositoryReady(tabs: state.tabs, activePath: tab.repository.path));
   }
 
@@ -107,7 +109,9 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
   ) async {
     final tabs = state.tabs;
     final index = tabs.indexWhere((tab) => tab.repository.path == event.path);
-    if (index == -1) return;
+    if (index == -1) {
+      return;
+    }
 
     final wasActive = state.activePath == event.path;
     await _repository.dispose(path: event.path);
@@ -135,7 +139,9 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
   ) async {
     final path = event.path ?? state.activePath;
     final tab = path == null ? null : _existingTab(path);
-    if (tab == null) return;
+    if (tab == null) {
+      return;
+    }
     try {
       final status = await _repository.status(path: tab.repository.path);
       emit(
@@ -160,13 +166,17 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
     Emitter<RepositoryState> emit,
   ) async {
     final path = state.activePath;
-    if (path == null) return;
+    if (path == null) {
+      return;
+    }
     await _onTabClosed(RepositoryTabClosed(path), emit);
   }
 
   RepositoryTab? _existingTab(String path) {
     for (final tab in state.tabs) {
-      if (tab.repository.path == path) return tab;
+      if (tab.repository.path == path) {
+        return tab;
+      }
     }
     return null;
   }

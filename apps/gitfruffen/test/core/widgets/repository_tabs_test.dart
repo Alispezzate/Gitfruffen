@@ -7,6 +7,7 @@ import 'package:gitfruffen/core/widgets/repository_tabs.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_event.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
+import 'package:gitfruffen/l10n/generated/app_localizations.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockGitRepository extends Mock implements GitRepositoryContract {}
@@ -15,8 +16,6 @@ class _MockWorkspaceRepository extends Mock
     implements WorkspaceRepositoryContract {}
 
 class _MockFilePickerService extends Mock implements FilePickerService {}
-
-class _FakeGitRepository extends Fake implements GitRepository {}
 
 void main() {
   late _MockGitRepository repository;
@@ -45,7 +44,17 @@ void main() {
     headCommit: null,
   );
 
-  setUpAll(() => registerFallbackValue(_FakeGitRepository()));
+  setUpAll(() {
+    registerFallbackValue(
+      const GitRepository(
+        path: '',
+        name: '',
+        isBare: false,
+        isHeadDetached: false,
+        isUnborn: false,
+      ),
+    );
+  });
 
   setUp(() {
     repository = _MockGitRepository();
@@ -79,6 +88,8 @@ void main() {
           create: (_) =>
               RepositoryBloc(repository: repository, workspace: workspace),
           child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: BlocBuilder<RepositoryBloc, RepositoryState>(
               builder: (context, _) => const Scaffold(body: RepositoryTabs()),
             ),

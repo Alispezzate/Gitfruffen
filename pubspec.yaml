@@ -6,3 +6,4 @@ environment:
 
 dev_dependencies:
   melos: ^7.0.0
+  strict: ^2.1.0

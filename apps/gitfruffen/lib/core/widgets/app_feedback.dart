@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
+import 'package:gitfruffen/core/theme/app_colors.dart';
+import 'package:gitfruffen/l10n/generated/app_localizations.dart';
 
 /// Centered loading indicator used by feature pages.
 class AppLoading extends StatelessWidget {
@@ -33,9 +34,9 @@ class AppLoading extends StatelessWidget {
 /// Standard empty-state placeholder.
 class AppEmptyState extends StatelessWidget {
   const AppEmptyState({
-    super.key,
     required this.icon,
     required this.title,
+    super.key,
     this.message,
     this.action,
   });
@@ -68,7 +69,7 @@ class AppEmptyState extends StatelessWidget {
 
 /// Standard error surface for feature pages.
 class AppErrorView extends StatelessWidget {
-  const AppErrorView({super.key, required this.message, this.onRetry});
+  const AppErrorView({required this.message, super.key, this.onRetry});
 
   final String message;
   final VoidCallback? onRetry;
@@ -83,7 +84,10 @@ class AppErrorView extends StatelessWidget {
         Text(message, style: Theme.of(context).textTheme.bodyLarge),
         if (onRetry != null) ...[
           const SizedBox(height: 16),
-          OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
+          OutlinedButton(
+            onPressed: onRetry,
+            child: Text(AppLocalizations.of(context).retryButton),
+          ),
         ],
       ],
     ),

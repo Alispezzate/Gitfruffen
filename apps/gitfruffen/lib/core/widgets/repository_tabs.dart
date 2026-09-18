@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../features/repository/bloc/repository_bloc.dart';
-import '../../features/repository/bloc/repository_event.dart';
-import '../../features/repository/bloc/repository_state.dart';
-import '../services/file_picker_service.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
+import 'package:gitfruffen/core/services/file_picker_service.dart';
+import 'package:gitfruffen/core/theme/app_colors.dart';
+import 'package:gitfruffen/core/theme/app_theme.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_event.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
+import 'package:gitfruffen/l10n/generated/app_localizations.dart';
 
 /// Horizontal strip of open repositories shown above the feature content.
 ///
@@ -18,11 +18,15 @@ class RepositoryTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final tabs = context.select((RepositoryBloc bloc) => bloc.state.tabs);
-    if (tabs.isEmpty) return const SizedBox.shrink();
+    final tabs = context.select<RepositoryBloc, List<RepositoryTab>>(
+      (bloc) => bloc.state.tabs,
+    );
+    if (tabs.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
-    final activePath = context.select(
-      (RepositoryBloc bloc) => bloc.state.activePath,
+    final activePath = context.select<RepositoryBloc, String?>(
+      (bloc) => bloc.state.activePath,
     );
 
     return Container(
@@ -120,7 +124,7 @@ class _RepositoryTabTile extends StatelessWidget {
               ],
               const SizedBox(width: 4),
               IconButton(
-                tooltip: 'Close repository',
+                tooltip: AppLocalizations.of(context).closeRepositoryTooltip,
                 onPressed: onClose,
                 visualDensity: VisualDensity.compact,
                 iconSize: 14,
@@ -157,9 +161,14 @@ class _AddRepositoryButton extends StatelessWidget {
   const _AddRepositoryButton();
 
   Future<void> _browse(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final picker = context.read<FilePickerService>();
-    final path = await picker.pickDirectory(title: 'Open repository');
-    if (path == null || !context.mounted) return;
+    final path = await picker.pickDirectory(
+      title: l10n.openRepositoryDialogTitle,
+    );
+    if (path == null || !context.mounted) {
+      return;
+    }
     context.read<RepositoryBloc>().add(RepositoryOpened(path));
   }
 
@@ -167,7 +176,7 @@ class _AddRepositoryButton extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 8),
     child: Tooltip(
-      message: 'Open a repository',
+      message: AppLocalizations.of(context).openRepositoryTooltip,
       child: OutlinedButton.icon(
         onPressed: () => _browse(context),
         style: OutlinedButton.styleFrom(
@@ -178,7 +187,7 @@ class _AddRepositoryButton extends StatelessWidget {
           ),
         ),
         icon: const Icon(Icons.add, size: 16),
-        label: const Text('Open'),
+        label: Text(AppLocalizations.of(context).openButton),
       ),
     ),
   );

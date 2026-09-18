@@ -11,14 +11,20 @@ class _MockGitRepository extends Mock implements GitRepositoryContract {}
 class _MockWorkspaceRepository extends Mock
     implements WorkspaceRepositoryContract {}
 
-class _FakeGitRepository extends Fake implements GitRepository {}
-
 void main() {
   late _MockGitRepository repository;
   late _MockWorkspaceRepository workspace;
 
   setUpAll(() {
-    registerFallbackValue(_FakeGitRepository());
+    registerFallbackValue(
+      const GitRepository(
+        path: '',
+        name: '',
+        isBare: false,
+        isHeadDetached: false,
+        isUnborn: false,
+      ),
+    );
   });
 
   const pathA = '/tmp/gitfruffen-a';

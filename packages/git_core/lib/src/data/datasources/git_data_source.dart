@@ -19,6 +19,10 @@ abstract interface class GitDataSource {
 
   Future<RepositoryStatus> status({required String path});
 
+  /// Returns the commit log reachable from HEAD, newest first.
+  ///
+  /// [from] is an exclusive cursor: when set, the walk starts after that
+  /// commit, so callers can request successive pages without duplicates.
   Future<List<Commit>> log({required String path, int limit, GitOid? from});
 
   Future<List<Branch>> branches({required String path});

@@ -28,9 +28,13 @@ sealed class RepositoryState extends Equatable {
   /// The active tab, or `null` when no repository is open.
   RepositoryTab? get active {
     final path = activePath;
-    if (path == null) return null;
+    if (path == null) {
+      return null;
+    }
     for (final tab in tabs) {
-      if (tab.repository.path == path) return tab;
+      if (tab.repository.path == path) {
+        return tab;
+      }
     }
     return null;
   }

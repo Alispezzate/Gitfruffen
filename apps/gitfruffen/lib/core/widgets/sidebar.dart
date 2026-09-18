@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gitfruffen/core/theme/app_colors.dart';
+import 'package:gitfruffen/core/theme/app_theme.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
+import 'package:gitfruffen/l10n/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-
-import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
-import '../../features/repository/bloc/repository_bloc.dart';
-import '../../features/repository/bloc/repository_state.dart';
 
 /// Primary navigation rail shown on every screen.
 ///
@@ -14,16 +14,24 @@ class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
 
   static const _destinations = <_Destination>[
-    _Destination('/repository', Icons.dashboard_outlined, 'Repository'),
-    _Destination('/history', Icons.account_tree_outlined, 'History'),
-    _Destination('/branches', Icons.call_split_outlined, 'Branches'),
-    _Destination('/settings', Icons.settings_outlined, 'Settings'),
+    _Destination('/repository', Icons.dashboard_outlined),
+    _Destination('/history', Icons.account_tree_outlined),
+    _Destination('/branches', Icons.call_split_outlined),
+    _Destination('/settings', Icons.settings_outlined),
   ];
 
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+
+    String labelFor(String route) => switch (route) {
+      '/repository' => l10n.navRepository,
+      '/history' => l10n.navHistory,
+      '/branches' => l10n.navBranches,
+      _ => l10n.navSettings,
+    };
 
     return Container(
       width: AppTheme.sidebarWidth,
@@ -40,6 +48,7 @@ class Sidebar extends StatelessWidget {
           for (final destination in _destinations)
             _SidebarTile(
               destination: destination,
+              label: labelFor(destination.route),
               selected: location.startsWith(destination.route),
             ),
           const Spacer(),
@@ -51,17 +60,21 @@ class Sidebar extends StatelessWidget {
 }
 
 class _Destination {
-  const _Destination(this.route, this.icon, this.label);
+  const _Destination(this.route, this.icon);
 
   final String route;
   final IconData icon;
-  final String label;
 }
 
 class _SidebarTile extends StatelessWidget {
-  const _SidebarTile({required this.destination, required this.selected});
+  const _SidebarTile({
+    required this.destination,
+    required this.label,
+    required this.selected,
+  });
 
   final _Destination destination;
+  final String label;
   final bool selected;
 
   @override
@@ -90,7 +103,7 @@ class _SidebarTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  destination.label,
+                  label,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: selected
                         ? AppColors.primary
@@ -118,7 +131,9 @@ class _RepositoryHeader extends StatelessWidget {
           prev.active != next.active || prev.runtimeType != next.runtimeType,
       builder: (context, state) {
         final active = state.active;
-        final name = active?.repository.name ?? 'No repository';
+        final name =
+            active?.repository.name ??
+            AppLocalizations.of(context).noRepository;
         final branch = active?.status.currentBranchName ?? '-';
 
         return Padding(
@@ -172,7 +187,10 @@ class _SidebarFooter extends StatelessWidget {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Text('Gitfruffen 0.1.0', style: theme.textTheme.bodySmall),
+      child: Text(
+        AppLocalizations.of(context).appVersion,
+        style: theme.textTheme.bodySmall,
+      ),
     );
   }
 }

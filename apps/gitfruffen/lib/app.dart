@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gitfruffen/core/di/dependency_injector.dart';
+import 'package:gitfruffen/core/router/app_router.dart';
+import 'package:gitfruffen/core/theme/app_theme.dart';
+import 'package:gitfruffen/features/settings/bloc/settings_bloc.dart';
+import 'package:gitfruffen/l10n/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'core/di/dependency_injector.dart';
-import 'core/router/app_router.dart';
-import 'core/theme/app_theme.dart';
-import 'features/settings/bloc/settings_bloc.dart';
-
 /// Root widget: wires the Pine dependency graph above the router.
 class App extends StatelessWidget {
-  const App({super.key, required this.preferences});
+  const App({required this.preferences, super.key});
 
   final SharedPreferences preferences;
 
@@ -33,11 +33,16 @@ class _AppViewState extends State<_AppView> {
   Widget build(BuildContext context) =>
       BlocBuilder<SettingsBloc, SettingsState>(
         builder: (context, settings) => MaterialApp.router(
-          title: 'Gitfruffen',
+          onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,
           themeMode: settings.themeMode,
+          locale: settings.languageCode == null
+              ? null
+              : Locale(settings.languageCode!),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: _router,
         ),
       );

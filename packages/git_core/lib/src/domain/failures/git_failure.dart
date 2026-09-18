@@ -5,7 +5,7 @@ import 'package:meta/meta.dart';
 ///
 /// Implementations are `sealed` so callers get exhaustive `switch` support.
 @immutable
-sealed class GitFailure extends Equatable {
+sealed class GitFailure extends Equatable implements Exception {
   const GitFailure(this.message, {this.cause});
 
   final String message;

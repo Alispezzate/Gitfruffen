@@ -98,6 +98,12 @@ final class FakeGitDataSource implements GitDataSource {
     );
   }
 
+  /// Deterministic commit history, newest first, used to exercise pagination.
+  List<Commit> get _history => List.generate(60, (index) {
+    final sha = (index + 1).toRadixString(16).padLeft(40, '0');
+    return _commit(sha, 'Commit #${60 - index}', parents: index == 59 ? 0 : 1);
+  });
+
   @override
   Future<List<Commit>> log({
     required String path,
@@ -105,19 +111,14 @@ final class FakeGitDataSource implements GitDataSource {
     GitOid? from,
   }) async {
     await Future<void>.delayed(latency);
-    return [
-      _commit(
-        'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678',
-        'Init repo',
-        parents: 0,
-      ),
-      _commit('b2c3d4e5f60718293a4b5c6d7e8f9012345678ab', 'Add sidebar'),
-      _commit(
-        'c3d4e5f60718293a4b5c6d7e8f9012345678abcd',
-        'Merge branch feature',
-      ),
-      _commit('d4e5f60718293a4b5c6d7e8f9012345678abcdef', 'Fix theme'),
-    ].take(limit).toList();
+    if (from == null) {
+      return _history.take(limit).toList();
+    }
+    final cursor = _history.indexWhere((commit) => commit.oid == from);
+    if (cursor == -1) {
+      return const [];
+    }
+    return _history.skip(cursor + 1).take(limit).toList();
   }
 
   @override

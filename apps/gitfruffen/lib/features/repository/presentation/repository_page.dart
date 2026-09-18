@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:git_core/git_core.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/app_feedback.dart';
-import '../bloc/repository_bloc.dart';
-import '../bloc/repository_event.dart';
-import '../bloc/repository_state.dart';
-import 'widgets/file_change_tile.dart';
+import 'package:gitfruffen/core/theme/app_colors.dart';
+import 'package:gitfruffen/core/theme/app_theme.dart';
+import 'package:gitfruffen/core/widgets/app_feedback.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_event.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
+import 'package:gitfruffen/features/repository/presentation/widgets/file_change_tile.dart';
+import 'package:gitfruffen/l10n/generated/app_localizations.dart';
 
 /// Working-tree overview for the open repository.
 class RepositoryPage extends StatelessWidget {
@@ -23,22 +24,23 @@ class RepositoryPage extends StatelessWidget {
         previous.runtimeType != next.runtimeType,
     builder: (context, state) {
       final active = state.active;
+      final l10n = AppLocalizations.of(context);
       if (active == null) {
         return switch (state) {
-          RepositoryInitial() => const AppEmptyState(
+          RepositoryInitial() => AppEmptyState(
             icon: Icons.folder_off_outlined,
-            title: 'No repository open',
-            message: 'Open a repository from the welcome screen.',
+            title: l10n.emptyNoRepository,
+            message: l10n.emptyNoRepositoryMessage,
           ),
-          RepositoryLoading() => const AppLoading(message: 'Opening…'),
+          RepositoryLoading() => AppLoading(message: l10n.openingRepository),
           RepositoryError(:final failure) => AppErrorView(
             message: failure.message,
             onRetry: () =>
                 context.read<RepositoryBloc>().add(const RepositoryRefreshed()),
           ),
-          RepositoryReady() => const AppEmptyState(
+          RepositoryReady() => AppEmptyState(
             icon: Icons.folder_off_outlined,
-            title: 'No repository open',
+            title: l10n.emptyNoRepository,
           ),
         };
       }
@@ -56,6 +58,7 @@ class _StatusView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final changes = status.changes;
 
     return Padding(
@@ -79,7 +82,7 @@ class _StatusView extends StatelessWidget {
                 ),
               ),
               IconButton(
-                tooltip: 'Refresh',
+                tooltip: l10n.refreshTooltip,
                 onPressed: () => context.read<RepositoryBloc>().add(
                   const RepositoryRefreshed(),
                 ),
@@ -93,35 +96,35 @@ class _StatusView extends StatelessWidget {
             runSpacing: 12,
             children: [
               _StatChip(
-                label: 'Staged',
+                label: l10n.stagedLabel,
                 value: status.stagedCount,
                 color: AppColors.added,
               ),
               _StatChip(
-                label: 'Unstaged',
+                label: l10n.unstagedLabel,
                 value: status.unstagedCount,
                 color: AppColors.modified,
               ),
               _StatChip(
-                label: 'Conflicted',
+                label: l10n.conflictedLabel,
                 value: status.conflictedCount,
                 color: AppColors.conflicted,
               ),
               _StatChip(
-                label: 'Total',
+                label: l10n.totalLabel,
                 value: changes.length,
                 color: AppColors.primary,
               ),
             ],
           ),
           const SizedBox(height: 24),
-          Text('Changes', style: theme.textTheme.titleMedium),
+          Text(l10n.changesTitle, style: theme.textTheme.titleMedium),
           const SizedBox(height: 12),
           Expanded(
             child: status.isClean
-                ? const AppEmptyState(
+                ? AppEmptyState(
                     icon: Icons.check_circle_outline,
-                    title: 'Working tree clean',
+                    title: l10n.workingTreeClean,
                   )
                 : Card(
                     child: ListView.separated(

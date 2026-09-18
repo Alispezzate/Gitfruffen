@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:git_core/git_core.dart';
 
-import 'branches_event.dart';
-import 'branches_state.dart';
+import 'package:gitfruffen/features/branches/bloc/branches_event.dart';
+import 'package:gitfruffen/features/branches/bloc/branches_state.dart';
 
 /// Loads local and remote branches and performs checkouts.
 class BranchesBloc extends Bloc<BranchesEvent, BranchesState> {

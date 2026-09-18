@@ -1,3 +1,4 @@
+import 'package:git2dart/git2dart.dart' as libgit2;
 import 'package:git_core/src/domain/entities/branch.dart';
 import 'package:git_core/src/domain/entities/commit.dart';
 import 'package:git_core/src/domain/entities/git_oid.dart';
@@ -5,8 +6,6 @@ import 'package:git_core/src/domain/entities/git_repository.dart';
 import 'package:git_core/src/domain/entities/remote.dart';
 import 'package:git_core/src/domain/entities/signature.dart';
 import 'package:git_core/src/domain/failures/git_failure.dart';
-
-import 'package:git2dart/git2dart.dart' as libgit2;
 
 /// Converts native `git2dart` objects into immutable domain entities.
 ///

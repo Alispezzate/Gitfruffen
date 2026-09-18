@@ -1,0 +1,339 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Gitfruffen",
+  "@appTitle": {
+    "description": "Application name shown in the window title and welcome header."
+  },
+
+  "welcomeTagline": "A fast, native Git client for your desktop.",
+  "@welcomeTagline": {
+    "description": "Short marketing line under the welcome headline."
+  },
+
+  "openRepositoryTitle": "Open a repository",
+  "@openRepositoryTitle": {
+    "description": "Title of the welcome card that opens a local repository."
+  },
+
+  "openRepositorySubtitle": "Select a local folder containing a Git repository.",
+  "@openRepositorySubtitle": {
+    "description": "Helper text of the open repository card."
+  },
+
+  "openRepositoryDialogTitle": "Open repository",
+  "@openRepositoryDialogTitle": {
+    "description": "Title passed to the native directory picker and used as tooltip."
+  },
+
+  "openRepositoryTooltip": "Open a repository",
+  "@openRepositoryTooltip": {
+    "description": "Tooltip of the button that opens a new repository tab."
+  },
+
+  "browseButton": "Browse…",
+  "@browseButton": {
+    "description": "Button that opens the native folder picker."
+  },
+
+  "cloneButton": "Clone…",
+  "@cloneButton": {
+    "description": "Button that opens the clone dialog."
+  },
+
+  "cloneDialogTitle": "Clone repository",
+  "@cloneDialogTitle": {
+    "description": "Title of the clone dialog."
+  },
+
+  "remoteUrlLabel": "Remote URL",
+  "@remoteUrlLabel": {
+    "description": "Label of the remote URL field in the clone dialog."
+  },
+
+  "localPathLabel": "Local path",
+  "@localPathLabel": {
+    "description": "Label of the local path field in the clone dialog."
+  },
+
+  "cancelButton": "Cancel",
+  "@cancelButton": {
+    "description": "Generic cancel action."
+  },
+
+  "cloneConfirmButton": "Clone",
+  "@cloneConfirmButton": {
+    "description": "Confirm action of the clone dialog."
+  },
+
+  "recentTitle": "Recent",
+  "@recentTitle": {
+    "description": "Header of the recent repositories list."
+  },
+
+  "navRepository": "Repository",
+  "@navRepository": {
+    "description": "Sidebar destination for the working tree."
+  },
+
+  "navHistory": "History",
+  "@navHistory": {
+    "description": "Sidebar destination for the commit log."
+  },
+
+  "navBranches": "Branches",
+  "@navBranches": {
+    "description": "Sidebar destination for branches."
+  },
+
+  "navSettings": "Settings",
+  "@navSettings": {
+    "description": "Sidebar destination for settings."
+  },
+
+  "noRepository": "No repository",
+  "@noRepository": {
+    "description": "Placeholder in the sidebar when no repository is open."
+  },
+
+  "appVersion": "Gitfruffen 0.1.0",
+  "@appVersion": {
+    "description": "Version label in the sidebar footer."
+  },
+
+  "closeRepositoryTooltip": "Close repository",
+  "@closeRepositoryTooltip": {
+    "description": "Tooltip of the tab close button."
+  },
+
+  "openButton": "Open",
+  "@openButton": {
+    "description": "Label of the button that opens a repository tab."
+  },
+
+  "emptyNoRepository": "No repository open",
+  "@emptyNoRepository": {
+    "description": "Empty state title when there is no active repository."
+  },
+
+  "emptyNoRepositoryMessage": "Open a repository from the welcome screen.",
+  "@emptyNoRepositoryMessage": {
+    "description": "Empty state message on the repository page."
+  },
+
+  "openingRepository": "Opening…",
+  "@openingRepository": {
+    "description": "Loading label while a repository is being opened."
+  },
+
+  "refreshTooltip": "Refresh",
+  "@refreshTooltip": {
+    "description": "Tooltip of the refresh action."
+  },
+
+  "stagedLabel": "Staged",
+  "@stagedLabel": {
+    "description": "Stat chip label for staged changes."
+  },
+
+  "unstagedLabel": "Unstaged",
+  "@unstagedLabel": {
+    "description": "Stat chip label for unstaged changes."
+  },
+
+  "conflictedLabel": "Conflicted",
+  "@conflictedLabel": {
+    "description": "Stat chip label for conflicted files."
+  },
+
+  "totalLabel": "Total",
+  "@totalLabel": {
+    "description": "Stat chip label for the total number of changes."
+  },
+
+  "changesTitle": "Changes",
+  "@changesTitle": {
+    "description": "Section title of the working tree changes list."
+  },
+
+  "workingTreeClean": "Working tree clean",
+  "@workingTreeClean": {
+    "description": "Empty state when there are no changes."
+  },
+
+  "fileChangeFrom": "from {path}",
+  "@fileChangeFrom": {
+    "description": "Subtitle of a renamed file showing its previous path.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+
+  "badgeStaged": "staged",
+  "@badgeStaged": {
+    "description": "Badge shown on a staged file."
+  },
+
+  "badgeUnstaged": "unstaged",
+  "@badgeUnstaged": {
+    "description": "Badge shown on an unstaged file."
+  },
+
+  "badgeConflict": "conflict",
+  "@badgeConflict": {
+    "description": "Badge shown on a conflicted file."
+  },
+
+  "emptyNoBranches": "No branches loaded",
+  "@emptyNoBranches": {
+    "description": "Empty state title on the branches page."
+  },
+
+  "emptyNoBranchesMessage": "Open a repository to list its branches.",
+  "@emptyNoBranchesMessage": {
+    "description": "Empty state message on the branches page."
+  },
+
+  "branchLocalSection": "Local",
+  "@branchLocalSection": {
+    "description": "Header of the local branches section."
+  },
+
+  "branchRemoteSection": "Remote",
+  "@branchRemoteSection": {
+    "description": "Header of the remote branches section."
+  },
+
+  "branchSectionTitle": "{section} · {count}",
+  "@branchSectionTitle": {
+    "description": "Section header showing the name and number of branches.",
+    "placeholders": {
+      "section": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "checkoutButton": "Checkout",
+  "@checkoutButton": {
+    "description": "Action that checks out a local branch."
+  },
+
+  "emptyNoHistory": "No history loaded",
+  "@emptyNoHistory": {
+    "description": "Empty state title on the history page."
+  },
+
+  "emptyNoHistoryMessage": "Open a repository to browse its commits.",
+  "@emptyNoHistoryMessage": {
+    "description": "Empty state message on the history page."
+  },
+
+  "emptyNoCommits": "No commits yet",
+  "@emptyNoCommits": {
+    "description": "Empty state when the repository has no commits."
+  },
+
+  "commitSubtitle": "{oid} · {author}",
+  "@commitSubtitle": {
+    "description": "Commit list subtitle with short hash and author.",
+    "placeholders": {
+      "oid": {
+        "type": "String"
+      },
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "Page title of the settings page."
+  },
+
+  "settingsAppearance": "Appearance",
+  "@settingsAppearance": {
+    "description": "Settings section for the theme."
+  },
+
+  "themeSystem": "System",
+  "@themeSystem": {
+    "description": "Theme mode option that follows the OS."
+  },
+
+  "themeLight": "Light",
+  "@themeLight": {
+    "description": "Light theme option."
+  },
+
+  "themeDark": "Dark",
+  "@themeDark": {
+    "description": "Dark theme option."
+  },
+
+  "settingsLanguage": "Language",
+  "@settingsLanguage": {
+    "description": "Settings section for the language."
+  },
+
+  "languageSystem": "System",
+  "@languageSystem": {
+    "description": "Language option that follows the OS."
+  },
+
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "English language option."
+  },
+
+  "languageItalian": "Italiano",
+  "@languageItalian": {
+    "description": "Italian language option."
+  },
+
+  "settingsRecentRepositories": "Recent repositories",
+  "@settingsRecentRepositories": {
+    "description": "Settings section listing recent repositories."
+  },
+
+  "settingsNoRecentRepositories": "No recent repositories.",
+  "@settingsNoRecentRepositories": {
+    "description": "Empty state in the recent repositories section."
+  },
+
+  "settingsGitEngine": "Git engine",
+  "@settingsGitEngine": {
+    "description": "Settings section with the engine version."
+  },
+
+  "libgit2Version": "libgit2: {version}",
+  "@libgit2Version": {
+    "description": "Engine version label.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+
+  "retryButton": "Retry",
+  "@retryButton": {
+    "description": "Generic retry action on error views."
+  },
+
+  "routeNotFound": "Route not found: {uri}",
+  "@routeNotFound": {
+    "description": "Fallback screen for unknown routes.",
+    "placeholders": {
+      "uri": {
+        "type": "String"
+      }
+    }
+  }
+}

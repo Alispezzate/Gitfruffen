@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gitfruffen/core/widgets/repository_tabs.dart';
+import 'package:gitfruffen/core/widgets/sidebar.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
+import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
+import 'package:gitfruffen/features/settings/bloc/settings_bloc.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../features/repository/bloc/repository_bloc.dart';
-import '../../features/repository/bloc/repository_state.dart';
-import '../../features/settings/bloc/settings_bloc.dart';
-import 'repository_tabs.dart';
-import 'sidebar.dart';
 
 /// Persistent shell hosting the repository tab strip, the [Sidebar] and the
 /// active feature page.
 class AppShell extends StatelessWidget {
-  const AppShell({super.key, required this.child});
+  const AppShell({required this.child, super.key});
 
   final Widget child;
 

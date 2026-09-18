@@ -148,5 +148,26 @@ void main() {
       expect(branches.any((b) => b.isHead), isTrue);
       expect(commits, hasLength(2));
     });
+
+    test('paginates the log with an exclusive cursor', () async {
+      final dataSource = FakeGitDataSource(latency: Duration.zero);
+
+      final first = await dataSource.log(path: '/tmp/repo', limit: 5);
+      final second = await dataSource.log(
+        path: '/tmp/repo',
+        limit: 5,
+        from: first.last.oid,
+      );
+
+      expect(first, hasLength(5));
+      expect(second, hasLength(5));
+      expect(
+        first
+            .map((c) => c.oid.value)
+            .toSet()
+            .intersection(second.map((c) => c.oid.value).toSet()),
+        isEmpty,
+      );
+    });
   });
 }

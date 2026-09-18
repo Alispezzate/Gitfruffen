@@ -12,6 +12,7 @@ final class WorkspaceRepositoryImpl implements WorkspaceRepositoryContract {
 
   static const _recentKey = 'workspace.recent_repositories';
   static const _themeKey = 'workspace.theme_mode';
+  static const _languageKey = 'workspace.language_code';
   static const _maxRecent = 15;
 
   final SharedPreferences _preferences;
@@ -38,4 +39,11 @@ final class WorkspaceRepositoryImpl implements WorkspaceRepositoryContract {
   @override
   Future<void> setThemeMode(String value) =>
       _preferences.setString(_themeKey, value);
+
+  @override
+  String get languageCode => _preferences.getString(_languageKey) ?? 'system';
+
+  @override
+  Future<void> setLanguageCode(String value) =>
+      _preferences.setString(_languageKey, value);
 }
