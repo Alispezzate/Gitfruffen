@@ -1,0 +1,108 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  FLUTTER_VERSION: "3.35.0"
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: macos
+            artifact: gitfruffen-macos
+          - os: windows-latest
+            target: windows
+            artifact: gitfruffen-windows
+          - os: ubuntu-latest
+            target: linux
+            artifact: gitfruffen-linux
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install Linux dependencies
+        if: matrix.target == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgtk-3-dev liblzma-dev
+
+      - name: Enable desktop
+        run: flutter config --enable-${{ matrix.target }}-desktop
+
+      - name: Install dependencies
+        working-directory: apps/gitfruffen
+        run: flutter pub get
+
+      - name: Build
+        working-directory: apps/gitfruffen
+        run: flutter build ${{ matrix.target }} --release
+
+      - name: Package (macOS)
+        if: matrix.target == 'macos'
+        working-directory: apps/gitfruffen
+        run: |
+          cd build/macos/Build/Products/Release
+          zip -r -y "$GITHUB_WORKSPACE/${{ matrix.artifact }}.zip" gitfruffen.app
+
+      - name: Package (Windows)
+        if: matrix.target == 'windows'
+        working-directory: apps/gitfruffen
+        shell: pwsh
+        run: |
+          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "${{ matrix.artifact }}.zip"
+
+      - name: Package (Linux)
+        if: matrix.target == 'linux'
+        working-directory: apps/gitfruffen
+        run: |
+          tar -czf "$GITHUB_WORKSPACE/${{ matrix.artifact }}.tar.gz" -C build/linux/x64/release/bundle .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            ${{ matrix.artifact }}.zip
+            ${{ matrix.artifact }}.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: Publish release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          generate_release_notes: true
+          files: dist/*
