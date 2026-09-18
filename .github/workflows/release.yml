@@ -70,7 +70,7 @@ jobs:
         working-directory: apps/gitfruffen
         shell: pwsh
         run: |
-          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "${{ matrix.artifact }}.zip"
+          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "$env:GITHUB_WORKSPACE/${{ matrix.artifact }}.zip"
 
       - name: Package (Linux)
         if: matrix.target == 'linux'
