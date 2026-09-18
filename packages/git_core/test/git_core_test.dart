@@ -169,5 +169,29 @@ void main() {
         isEmpty,
       );
     });
+
+    test('returns worktrees, stashes and reflog', () async {
+      final dataSource = FakeGitDataSource(latency: Duration.zero);
+
+      final worktrees = await dataSource.worktrees(path: '/tmp/repo');
+      final stashes = await dataSource.stashes(path: '/tmp/repo');
+      final reflog = await dataSource.reflog(path: '/tmp/repo');
+
+      expect(worktrees, isNotEmpty);
+      expect(worktrees.first.isMain, isTrue);
+      expect(stashes, hasLength(1));
+      expect(reflog, hasLength(2));
+      expect(reflog.first.newOid.value.isNotEmpty, isTrue);
+    });
+  });
+
+  group('GitObjectMapper new entities', () {
+    const mapper = GitObjectMapper();
+
+    test('maps a reset mode to the engine enum', () {
+      expect(mapper.toResetMode(GitResetMode.hard), libgit2.GitReset.hard);
+      expect(mapper.toResetMode(GitResetMode.mixed), libgit2.GitReset.mixed);
+      expect(mapper.toResetMode(GitResetMode.soft), libgit2.GitReset.soft);
+    });
   });
 }

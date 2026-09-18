@@ -142,6 +142,101 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checkoutButton => 'Checkout';
 
   @override
+  String get worktreesSection => 'Worktrees';
+
+  @override
+  String get tagsSection => 'Tags';
+
+  @override
+  String get removeWorktreeTooltip => 'Remove worktree';
+
+  @override
+  String get deleteBranchTooltip => 'Delete branch';
+
+  @override
+  String get deleteBranchDialogTitle => 'Delete branch';
+
+  @override
+  String deleteBranchDialogMessage(String branch) {
+    return 'Delete branch $branch? This cannot be undone.';
+  }
+
+  @override
+  String branchAheadBehind(int ahead, int behind) {
+    return '↑$ahead ↓$behind';
+  }
+
+  @override
+  String get pushTooltip => 'Push';
+
+  @override
+  String get pullTooltip => 'Pull';
+
+  @override
+  String get createBranchTooltip => 'Create branch';
+
+  @override
+  String get stashTooltip => 'Stash changes';
+
+  @override
+  String get undoTooltip => 'Undo';
+
+  @override
+  String get redoTooltip => 'Redo';
+
+  @override
+  String get createBranchDialogTitle => 'Create branch';
+
+  @override
+  String get branchNameLabel => 'Branch name';
+
+  @override
+  String get createBranchConfirmButton => 'Create';
+
+  @override
+  String get stashDialogTitle => 'Stash changes';
+
+  @override
+  String get stashMessageLabel => 'Message (optional)';
+
+  @override
+  String get stashConfirmButton => 'Stash';
+
+  @override
+  String get undoDialogTitle => 'Undo';
+
+  @override
+  String get undoDialogMessage =>
+      'Move HEAD back one step? Staged changes return to the working tree.';
+
+  @override
+  String get redoDialogTitle => 'Redo';
+
+  @override
+  String get redoDialogMessage => 'Re-apply the last undone HEAD position?';
+
+  @override
+  String get confirmButton => 'Confirm';
+
+  @override
+  String get stageAllButton => 'Stage all';
+
+  @override
+  String get unstageAllButton => 'Unstage all';
+
+  @override
+  String get stageFileTooltip => 'Stage file';
+
+  @override
+  String get unstageFileTooltip => 'Unstage file';
+
+  @override
+  String get commitMessageHint => 'Commit message';
+
+  @override
+  String get commitButton => 'Commit';
+
+  @override
   String get emptyNoHistory => 'No history loaded';
 
   @override

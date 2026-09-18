@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gitfruffen/core/widgets/app_shell.dart';
-import 'package:gitfruffen/features/branches/presentation/branches_page.dart';
-import 'package:gitfruffen/features/history/presentation/history_page.dart';
 import 'package:gitfruffen/features/repository/presentation/repository_page.dart';
 import 'package:gitfruffen/features/settings/presentation/settings_page.dart';
 import 'package:gitfruffen/features/welcome/presentation/welcome_page.dart';
@@ -26,14 +24,6 @@ abstract final class AppRouter {
           GoRoute(
             path: '/repository',
             builder: (context, state) => const RepositoryPage(),
-          ),
-          GoRoute(
-            path: '/history',
-            builder: (context, state) => const HistoryPage(),
-          ),
-          GoRoute(
-            path: '/branches',
-            builder: (context, state) => const BranchesPage(),
           ),
           GoRoute(
             path: '/settings',

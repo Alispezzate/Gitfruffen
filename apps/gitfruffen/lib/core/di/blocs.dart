@@ -17,18 +17,4 @@ List<BlocProvider> _blocs() => [
       workspace: context.read<WorkspaceRepositoryContract>(),
     ),
   ),
-  BlocProvider<HistoryBloc>(
-    create: (context) =>
-        HistoryBloc(repository: context.read<GitRepositoryContract>()),
-  ),
-  BlocProvider<BranchesBloc>(
-    create: (context) =>
-        BranchesBloc(repository: context.read<GitRepositoryContract>()),
-  ),
-  BlocProvider<SettingsBloc>(
-    create: (context) => SettingsBloc(
-      workspace: context.read<WorkspaceRepositoryContract>(),
-      dataSource: context.read<GitDataSource>(),
-    )..add(const SettingsLoaded()),
-  ),
 ];

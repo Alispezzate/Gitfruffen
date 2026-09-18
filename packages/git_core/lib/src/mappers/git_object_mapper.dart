@@ -3,8 +3,12 @@ import 'package:git_core/src/domain/entities/branch.dart';
 import 'package:git_core/src/domain/entities/commit.dart';
 import 'package:git_core/src/domain/entities/git_oid.dart';
 import 'package:git_core/src/domain/entities/git_repository.dart';
+import 'package:git_core/src/domain/entities/git_reset_mode.dart';
+import 'package:git_core/src/domain/entities/reflog.dart';
 import 'package:git_core/src/domain/entities/remote.dart';
 import 'package:git_core/src/domain/entities/signature.dart';
+import 'package:git_core/src/domain/entities/stash.dart';
+import 'package:git_core/src/domain/entities/worktree.dart';
 import 'package:git_core/src/domain/failures/git_failure.dart';
 
 /// Converts native `git2dart` objects into immutable domain entities.
@@ -54,6 +58,42 @@ final class GitObjectMapper {
     url: remote.url,
     pushUrl: remote.pushUrl.isEmpty ? null : remote.pushUrl,
   );
+
+  /// Maps a linked worktree.
+  WorktreeInfo toWorktree(
+    libgit2.Worktree worktree, {
+    String? branch,
+    bool isMain = false,
+  }) => WorktreeInfo(
+    name: worktree.name,
+    path: worktree.path,
+    branch: branch,
+    isLocked: worktree.isLocked,
+    isPrunable: worktree.isPrunable,
+    isMain: isMain,
+  );
+
+  /// Maps a stash entry.
+  StashEntry toStash(libgit2.Stash stash) => StashEntry(
+    index: stash.index,
+    message: stash.message,
+    oid: GitOid(stash.oid.sha),
+  );
+
+  /// Maps a single reflog entry.
+  ReflogEntry toReflog(libgit2.RefLogEntry entry) => ReflogEntry(
+    oldOid: GitOid(entry.oldOid.sha),
+    newOid: GitOid(entry.newOid.sha),
+    message: entry.message,
+    committer: toSignature(entry.committer),
+  );
+
+  /// Maps the domain reset mode to the engine enum.
+  libgit2.GitReset toResetMode(GitResetMode mode) => switch (mode) {
+    GitResetMode.soft => libgit2.GitReset.soft,
+    GitResetMode.mixed => libgit2.GitReset.mixed,
+    GitResetMode.hard => libgit2.GitReset.hard,
+  };
 
   /// Maps a single working-tree entry reported by libgit2.
   ///

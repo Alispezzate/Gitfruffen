@@ -14,9 +14,7 @@ class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
 
   static const _destinations = <_Destination>[
-    _Destination('/repository', Icons.dashboard_outlined),
-    _Destination('/history', Icons.account_tree_outlined),
-    _Destination('/branches', Icons.call_split_outlined),
+    _Destination('/repository', Icons.account_tree_outlined),
     _Destination('/settings', Icons.settings_outlined),
   ];
 
@@ -28,8 +26,6 @@ class Sidebar extends StatelessWidget {
 
     String labelFor(String route) => switch (route) {
       '/repository' => l10n.navRepository,
-      '/history' => l10n.navHistory,
-      '/branches' => l10n.navBranches,
       _ => l10n.navSettings,
     };
 

@@ -350,6 +350,186 @@ abstract class AppLocalizations {
   /// **'Checkout'**
   String get checkoutButton;
 
+  /// Header of the worktrees section.
+  ///
+  /// In en, this message translates to:
+  /// **'Worktrees'**
+  String get worktreesSection;
+
+  /// Header of the tags section.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get tagsSection;
+
+  /// Tooltip of the worktree remove action.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove worktree'**
+  String get removeWorktreeTooltip;
+
+  /// Tooltip of the branch delete action.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete branch'**
+  String get deleteBranchTooltip;
+
+  /// Title of the delete branch confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete branch'**
+  String get deleteBranchDialogTitle;
+
+  /// Message of the delete branch confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete branch {branch}? This cannot be undone.'**
+  String deleteBranchDialogMessage(String branch);
+
+  /// Ahead/behind counters shown as a branch subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'↑{ahead} ↓{behind}'**
+  String branchAheadBehind(int ahead, int behind);
+
+  /// Toolbar action that pushes the current branch.
+  ///
+  /// In en, this message translates to:
+  /// **'Push'**
+  String get pushTooltip;
+
+  /// Toolbar action that pulls the default remote.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull'**
+  String get pullTooltip;
+
+  /// Toolbar action that creates a branch.
+  ///
+  /// In en, this message translates to:
+  /// **'Create branch'**
+  String get createBranchTooltip;
+
+  /// Toolbar action that stashes working tree changes.
+  ///
+  /// In en, this message translates to:
+  /// **'Stash changes'**
+  String get stashTooltip;
+
+  /// Toolbar action that moves HEAD back.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undoTooltip;
+
+  /// Toolbar action that re-applies an undone HEAD move.
+  ///
+  /// In en, this message translates to:
+  /// **'Redo'**
+  String get redoTooltip;
+
+  /// Title of the create branch dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Create branch'**
+  String get createBranchDialogTitle;
+
+  /// Label of the branch name field.
+  ///
+  /// In en, this message translates to:
+  /// **'Branch name'**
+  String get branchNameLabel;
+
+  /// Confirm action of the create branch dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get createBranchConfirmButton;
+
+  /// Title of the stash dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Stash changes'**
+  String get stashDialogTitle;
+
+  /// Label of the stash message field.
+  ///
+  /// In en, this message translates to:
+  /// **'Message (optional)'**
+  String get stashMessageLabel;
+
+  /// Confirm action of the stash dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Stash'**
+  String get stashConfirmButton;
+
+  /// Title of the undo confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undoDialogTitle;
+
+  /// Message of the undo confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Move HEAD back one step? Staged changes return to the working tree.'**
+  String get undoDialogMessage;
+
+  /// Title of the redo confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Redo'**
+  String get redoDialogTitle;
+
+  /// Message of the redo confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-apply the last undone HEAD position?'**
+  String get redoDialogMessage;
+
+  /// Generic confirm action in dialogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmButton;
+
+  /// Action that stages every change.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage all'**
+  String get stageAllButton;
+
+  /// Action that unstages every change.
+  ///
+  /// In en, this message translates to:
+  /// **'Unstage all'**
+  String get unstageAllButton;
+
+  /// Tooltip of the per-file stage action.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage file'**
+  String get stageFileTooltip;
+
+  /// Tooltip of the per-file unstage action.
+  ///
+  /// In en, this message translates to:
+  /// **'Unstage file'**
+  String get unstageFileTooltip;
+
+  /// Placeholder of the commit message field.
+  ///
+  /// In en, this message translates to:
+  /// **'Commit message'**
+  String get commitMessageHint;
+
+  /// Action that creates a commit from the index.
+  ///
+  /// In en, this message translates to:
+  /// **'Commit'**
+  String get commitButton;
+
   /// Empty state title on the history page.
   ///
   /// In en, this message translates to:

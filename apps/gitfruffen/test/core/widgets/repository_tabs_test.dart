@@ -67,6 +67,28 @@ void main() {
       () => repository.status(path: any(named: 'path')),
     ).thenAnswer((_) async => status);
     when(
+      () => repository.graph(
+        path: any(named: 'path'),
+        limit: any(named: 'limit'),
+        from: any(named: 'from'),
+      ),
+    ).thenAnswer((_) async => const <Commit>[]);
+    when(
+      () => repository.branches(path: any(named: 'path')),
+    ).thenAnswer((_) async => const <Branch>[]);
+    when(
+      () => repository.tags(path: any(named: 'path')),
+    ).thenAnswer((_) async => const <Tag>[]);
+    when(
+      () => repository.worktrees(path: any(named: 'path')),
+    ).thenAnswer((_) async => const <WorktreeInfo>[]);
+    when(
+      () => repository.stashes(path: any(named: 'path')),
+    ).thenAnswer((_) async => const <StashEntry>[]);
+    when(
+      () => repository.reflog(path: any(named: 'path')),
+    ).thenAnswer((_) async => const <ReflogEntry>[]);
+    when(
       () => repository.dispose(path: any(named: 'path')),
     ).thenAnswer((_) async {});
     when(

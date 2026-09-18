@@ -143,6 +143,102 @@ class AppLocalizationsIt extends AppLocalizations {
   String get checkoutButton => 'Checkout';
 
   @override
+  String get worktreesSection => 'Worktree';
+
+  @override
+  String get tagsSection => 'Tag';
+
+  @override
+  String get removeWorktreeTooltip => 'Rimuovi worktree';
+
+  @override
+  String get deleteBranchTooltip => 'Elimina ramo';
+
+  @override
+  String get deleteBranchDialogTitle => 'Elimina ramo';
+
+  @override
+  String deleteBranchDialogMessage(String branch) {
+    return 'Eliminare il ramo $branch? L\'operazione non può essere annullata.';
+  }
+
+  @override
+  String branchAheadBehind(int ahead, int behind) {
+    return '↑$ahead ↓$behind';
+  }
+
+  @override
+  String get pushTooltip => 'Push';
+
+  @override
+  String get pullTooltip => 'Pull';
+
+  @override
+  String get createBranchTooltip => 'Crea ramo';
+
+  @override
+  String get stashTooltip => 'Metti in stash';
+
+  @override
+  String get undoTooltip => 'Annulla';
+
+  @override
+  String get redoTooltip => 'Ripeti';
+
+  @override
+  String get createBranchDialogTitle => 'Crea ramo';
+
+  @override
+  String get branchNameLabel => 'Nome del ramo';
+
+  @override
+  String get createBranchConfirmButton => 'Crea';
+
+  @override
+  String get stashDialogTitle => 'Metti in stash';
+
+  @override
+  String get stashMessageLabel => 'Messaggio (opzionale)';
+
+  @override
+  String get stashConfirmButton => 'Stash';
+
+  @override
+  String get undoDialogTitle => 'Annulla';
+
+  @override
+  String get undoDialogMessage =>
+      'Spostare HEAD indietro di un passo? Le modifiche in stage tornano nel working tree.';
+
+  @override
+  String get redoDialogTitle => 'Ripeti';
+
+  @override
+  String get redoDialogMessage =>
+      'Riapplicare l\'ultima posizione di HEAD annullata?';
+
+  @override
+  String get confirmButton => 'Conferma';
+
+  @override
+  String get stageAllButton => 'Stage di tutto';
+
+  @override
+  String get unstageAllButton => 'Rimuovi stage';
+
+  @override
+  String get stageFileTooltip => 'Metti in stage';
+
+  @override
+  String get unstageFileTooltip => 'Rimuovi dallo stage';
+
+  @override
+  String get commitMessageHint => 'Messaggio del commit';
+
+  @override
+  String get commitButton => 'Commit';
+
+  @override
   String get emptyNoHistory => 'Nessuna cronologia caricata';
 
   @override

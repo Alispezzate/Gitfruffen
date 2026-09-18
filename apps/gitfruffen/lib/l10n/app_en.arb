@@ -224,6 +224,169 @@
     "description": "Action that checks out a local branch."
   },
 
+  "worktreesSection": "Worktrees",
+  "@worktreesSection": {
+    "description": "Header of the worktrees section."
+  },
+
+  "tagsSection": "Tags",
+  "@tagsSection": {
+    "description": "Header of the tags section."
+  },
+
+  "removeWorktreeTooltip": "Remove worktree",
+  "@removeWorktreeTooltip": {
+    "description": "Tooltip of the worktree remove action."
+  },
+
+  "deleteBranchTooltip": "Delete branch",
+  "@deleteBranchTooltip": {
+    "description": "Tooltip of the branch delete action."
+  },
+
+  "deleteBranchDialogTitle": "Delete branch",
+  "@deleteBranchDialogTitle": {
+    "description": "Title of the delete branch confirmation dialog."
+  },
+
+  "deleteBranchDialogMessage": "Delete branch {branch}? This cannot be undone.",
+  "@deleteBranchDialogMessage": {
+    "description": "Message of the delete branch confirmation dialog.",
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+
+  "branchAheadBehind": "↑{ahead} ↓{behind}",
+  "@branchAheadBehind": {
+    "description": "Ahead/behind counters shown as a branch subtitle.",
+    "placeholders": {
+      "ahead": {
+        "type": "int"
+      },
+      "behind": {
+        "type": "int"
+      }
+    }
+  },
+
+  "pushTooltip": "Push",
+  "@pushTooltip": {
+    "description": "Toolbar action that pushes the current branch."
+  },
+
+  "pullTooltip": "Pull",
+  "@pullTooltip": {
+    "description": "Toolbar action that pulls the default remote."
+  },
+
+  "createBranchTooltip": "Create branch",
+  "@createBranchTooltip": {
+    "description": "Toolbar action that creates a branch."
+  },
+
+  "stashTooltip": "Stash changes",
+  "@stashTooltip": {
+    "description": "Toolbar action that stashes working tree changes."
+  },
+
+  "undoTooltip": "Undo",
+  "@undoTooltip": {
+    "description": "Toolbar action that moves HEAD back."
+  },
+
+  "redoTooltip": "Redo",
+  "@redoTooltip": {
+    "description": "Toolbar action that re-applies an undone HEAD move."
+  },
+
+  "createBranchDialogTitle": "Create branch",
+  "@createBranchDialogTitle": {
+    "description": "Title of the create branch dialog."
+  },
+
+  "branchNameLabel": "Branch name",
+  "@branchNameLabel": {
+    "description": "Label of the branch name field."
+  },
+
+  "createBranchConfirmButton": "Create",
+  "@createBranchConfirmButton": {
+    "description": "Confirm action of the create branch dialog."
+  },
+
+  "stashDialogTitle": "Stash changes",
+  "@stashDialogTitle": {
+    "description": "Title of the stash dialog."
+  },
+
+  "stashMessageLabel": "Message (optional)",
+  "@stashMessageLabel": {
+    "description": "Label of the stash message field."
+  },
+
+  "stashConfirmButton": "Stash",
+  "@stashConfirmButton": {
+    "description": "Confirm action of the stash dialog."
+  },
+
+  "undoDialogTitle": "Undo",
+  "@undoDialogTitle": {
+    "description": "Title of the undo confirmation dialog."
+  },
+
+  "undoDialogMessage": "Move HEAD back one step? Staged changes return to the working tree.",
+  "@undoDialogMessage": {
+    "description": "Message of the undo confirmation dialog."
+  },
+
+  "redoDialogTitle": "Redo",
+  "@redoDialogTitle": {
+    "description": "Title of the redo confirmation dialog."
+  },
+
+  "redoDialogMessage": "Re-apply the last undone HEAD position?",
+  "@redoDialogMessage": {
+    "description": "Message of the redo confirmation dialog."
+  },
+
+  "confirmButton": "Confirm",
+  "@confirmButton": {
+    "description": "Generic confirm action in dialogs."
+  },
+
+  "stageAllButton": "Stage all",
+  "@stageAllButton": {
+    "description": "Action that stages every change."
+  },
+
+  "unstageAllButton": "Unstage all",
+  "@unstageAllButton": {
+    "description": "Action that unstages every change."
+  },
+
+  "stageFileTooltip": "Stage file",
+  "@stageFileTooltip": {
+    "description": "Tooltip of the per-file stage action."
+  },
+
+  "unstageFileTooltip": "Unstage file",
+  "@unstageFileTooltip": {
+    "description": "Tooltip of the per-file unstage action."
+  },
+
+  "commitMessageHint": "Commit message",
+  "@commitMessageHint": {
+    "description": "Placeholder of the commit message field."
+  },
+
+  "commitButton": "Commit",
+  "@commitButton": {
+    "description": "Action that creates a commit from the index."
+  },
+
   "emptyNoHistory": "No history loaded",
   "@emptyNoHistory": {
     "description": "Empty state title on the history page."
