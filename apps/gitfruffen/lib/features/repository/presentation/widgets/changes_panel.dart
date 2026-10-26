@@ -1,193 +1,267 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:git_core/git_core.dart';
+
 import 'package:gitfruffen/core/theme/app_colors.dart';
-import 'package:gitfruffen/core/widgets/app_feedback.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_event.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
-import 'package:gitfruffen/features/repository/presentation/widgets/file_change_tile.dart';
+import 'package:gitfruffen/features/repository/presentation/widgets/changed_files_list.dart';
 import 'package:gitfruffen/l10n/generated/app_localizations.dart';
 
-/// Right panel of the repository workspace.
-///
-/// Shows the working tree changes split into staged and unstaged sections and
-/// the commit prompt that creates a commit from the index.
+/// Working tree changes shown in the right panel, split into unstaged and
+/// staged sections. Tapping a file asks the workspace to show its unified diff.
 class ChangesPanel extends StatefulWidget {
-  const ChangesPanel({required this.tab, super.key});
+  const ChangesPanel({required this.tab, required this.onOpenFile, super.key});
 
   final RepositoryTab tab;
+  final ValueChanged<DiffFile> onOpenFile;
 
   @override
   State<ChangesPanel> createState() => _ChangesPanelState();
 }
 
 class _ChangesPanelState extends State<ChangesPanel> {
-  final TextEditingController _message = TextEditingController();
+  FileViewMode _mode = FileViewMode.path;
+  bool _unstagedExpanded = true;
+  bool _stagedExpanded = true;
 
   @override
-  void dispose() {
-    _message.dispose();
-    super.dispose();
-  }
-
-  void _submit() {
-    final message = _message.text.trim();
-    if (message.isEmpty) {
-      return;
+  void didUpdateWidget(ChangesPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.tab.repository.path != widget.tab.repository.path) {
+      _mode = FileViewMode.path;
     }
-    context.read<RepositoryBloc>().add(CommitSubmitted(message));
-    _message.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final tab = widget.tab;
     final theme = Theme.of(context);
-    final changes = widget.tab.status.changes;
-    final staged = changes.where((c) => c.staged).toList();
-    final unstaged = changes.where((c) => !c.staged || c.unstaged).toList();
-    final isBusy = context.select<RepositoryBloc, bool>(
-      (bloc) => bloc.state.isBusy,
-    );
+    final l10n = AppLocalizations.of(context);
+    final changes = tab.status.changes;
+    final unstaged = changes.where((c) => c.unstaged || c.conflicted);
+    final staged = changes.where((c) => c.staged && !c.conflicted);
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(10, 8, 6, 4),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.changesOnBranch(
+                    changes.length,
+                    tab.status.currentBranchName ?? '-',
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall,
+                ),
+              ),
+              FileViewModeToggle(
+                mode: _mode,
+                onChanged: (mode) => setState(() => _mode = mode),
+              ),
+            ],
+          ),
+        ),
         Expanded(
-          child: changes.isEmpty
-              ? AppEmptyState(
-                  icon: Icons.check_circle_outline,
-                  title: l10n.workingTreeClean,
+          child: ListView(
+            padding: const EdgeInsets.only(bottom: 8),
+            children: [
+              if (changes.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                  child: Text(
+                    l10n.workingTreeClean,
+                    style: theme.textTheme.bodySmall,
+                  ),
                 )
-              : ListView(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+              else ...[
+                _Section(
+                  title: l10n.unstagedFiles,
+                  count: unstaged.length,
+                  expanded: _unstagedExpanded,
+                  actionLabel: l10n.stageAllChanges,
+                  onAction: unstaged.isEmpty
+                      ? null
+                      : () => context.read<RepositoryBloc>().add(
+                          const AllFilesStaged(),
+                        ),
+                  onToggle: () =>
+                      setState(() => _unstagedExpanded = !_unstagedExpanded),
                   children: [
-                    _ChangeSection(
-                      title: l10n.stagedLabel,
-                      changes: staged,
-                      actionLabel: l10n.unstageAllButton,
-                      onAction: staged.isEmpty
-                          ? null
-                          : () => context.read<RepositoryBloc>().add(
-                              const AllFilesUnstaged(),
-                            ),
-                      onToggle: (change) => context.read<RepositoryBloc>().add(
-                        FilesUnstaged([change.path]),
-                      ),
-                      toggleIcon: Icons.remove,
-                      toggleTooltip: l10n.unstageFileTooltip,
-                    ),
-                    _ChangeSection(
-                      title: l10n.unstagedLabel,
-                      changes: unstaged,
-                      actionLabel: l10n.stageAllButton,
-                      onAction: unstaged.isEmpty
-                          ? null
-                          : () => context.read<RepositoryBloc>().add(
-                              const AllFilesStaged(),
-                            ),
-                      onToggle: (change) => context.read<RepositoryBloc>().add(
-                        FilesStaged([change.path]),
-                      ),
-                      toggleIcon: Icons.add,
-                      toggleTooltip: l10n.stageFileTooltip,
+                    ChangedFilesList(
+                      mode: _mode,
+                      entries: [
+                        for (final change in unstaged)
+                          _entry(context, change, staged: false),
+                      ],
                     ),
                   ],
                 ),
-        ),
-        Divider(height: 1, color: theme.dividerColor),
-        Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextField(
-                controller: _message,
-                minLines: 2,
-                maxLines: 5,
-                enabled: !isBusy,
-                textInputAction: TextInputAction.newline,
-                decoration: InputDecoration(
-                  hintText: l10n.commitMessageHint,
-                  border: const OutlineInputBorder(),
+                _Section(
+                  title: l10n.stagedFiles,
+                  count: staged.length,
+                  expanded: _stagedExpanded,
+                  actionLabel: l10n.unstageAllChanges,
+                  onAction: staged.isEmpty
+                      ? null
+                      : () => context.read<RepositoryBloc>().add(
+                          const AllFilesUnstaged(),
+                        ),
+                  onToggle: () =>
+                      setState(() => _stagedExpanded = !_stagedExpanded),
+                  children: [
+                    ChangedFilesList(
+                      mode: _mode,
+                      entries: [
+                        for (final change in staged)
+                          _entry(context, change, staged: true),
+                      ],
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 8),
-              FilledButton.icon(
-                onPressed: (!isBusy && staged.isNotEmpty) ? _submit : null,
-                icon: const Icon(Icons.check, size: 18),
-                label: Text(l10n.commitButton),
-              ),
+              ],
             ],
           ),
         ),
       ],
     );
   }
+
+  ChangedFileEntry _entry(
+    BuildContext context,
+    FileChange change, {
+    required bool staged,
+  }) {
+    final diff = _findDiff(
+      staged ? widget.tab.stagedDiff : widget.tab.unstagedDiff,
+      change,
+    );
+    return ChangedFileEntry(
+      path: change.path,
+      oldPath: change.oldPath,
+      type: change.type,
+      insertions: change.conflicted ? 0 : (diff?.insertions ?? 0),
+      deletions: change.conflicted ? 0 : (diff?.deletions ?? 0),
+      conflicted: change.conflicted,
+      onTap: diff == null ? null : () => widget.onOpenFile(diff),
+      trailing: change.conflicted
+          ? null
+          : _stageAction(context, change, staged: staged),
+    );
+  }
+
+  Widget _stageAction(
+    BuildContext context,
+    FileChange change, {
+    required bool staged,
+  }) {
+    final l10n = AppLocalizations.of(context);
+    return IconButton(
+      tooltip: staged ? l10n.unstageFileTooltip : l10n.stageFileTooltip,
+      onPressed: () => context.read<RepositoryBloc>().add(
+        staged ? FilesUnstaged([change.path]) : FilesStaged([change.path]),
+      ),
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints.tightFor(width: 24, height: 24),
+      visualDensity: VisualDensity.compact,
+      iconSize: 14,
+      color: AppColors.primary,
+      icon: Icon(staged ? Icons.remove : Icons.add),
+    );
+  }
+
+  static DiffFile? _findDiff(DiffResult diff, FileChange change) {
+    for (final file in diff.files) {
+      if (file.path == change.path) {
+        return file;
+      }
+      if (file.oldPath != null && file.oldPath == change.path) {
+        return file;
+      }
+      if (change.oldPath != null &&
+          (file.path == change.oldPath || file.oldPath == change.oldPath)) {
+        return file;
+      }
+    }
+    return null;
+  }
 }
 
-class _ChangeSection extends StatelessWidget {
-  const _ChangeSection({
+/// Compact expandable section header plus its children.
+class _Section extends StatelessWidget {
+  const _Section({
     required this.title,
-    required this.changes,
-    required this.actionLabel,
-    required this.onAction,
+    required this.count,
+    required this.expanded,
     required this.onToggle,
-    required this.toggleIcon,
-    required this.toggleTooltip,
+    required this.children,
+    this.actionLabel,
+    this.onAction,
   });
 
   final String title;
-  final List<FileChange> changes;
-  final String actionLabel;
+  final int count;
+  final bool expanded;
+  final VoidCallback onToggle;
+  final List<Widget> children;
+  final String? actionLabel;
   final VoidCallback? onAction;
-  final ValueChanged<FileChange> onToggle;
-  final IconData toggleIcon;
-  final String toggleTooltip;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 8, 4, 4),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  l10n.branchSectionTitle(title, changes.length),
-                  style: theme.textTheme.titleMedium,
-                ),
+        SizedBox(
+          height: 32,
+          child: InkWell(
+            onTap: onToggle,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 6, right: 4),
+              child: Row(
+                children: [
+                  Icon(
+                    expanded
+                        ? Icons.keyboard_arrow_down
+                        : Icons.keyboard_arrow_right,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 2),
+                  Expanded(
+                    child: Text(
+                      l10n.branchSectionTitle(title, count),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                  if (actionLabel != null && onAction != null)
+                    TextButton(
+                      onPressed: onAction,
+                      style: TextButton.styleFrom(
+                        minimumSize: const Size(0, 28),
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        textStyle: theme.textTheme.bodySmall?.copyWith(
+                          fontSize: 11,
+                        ),
+                      ),
+                      child: Text(actionLabel!),
+                    ),
+                ],
               ),
-              if (onAction != null)
-                TextButton(onPressed: onAction, child: Text(actionLabel)),
-            ],
+            ),
           ),
         ),
-        if (changes.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            child: Text('-', style: theme.textTheme.bodySmall),
-          )
-        else
-          for (final change in changes)
-            Row(
-              children: [
-                Expanded(child: FileChangeTile(change: change)),
-                IconButton(
-                  tooltip: toggleTooltip,
-                  onPressed: () => onToggle(change),
-                  visualDensity: VisualDensity.compact,
-                  iconSize: 16,
-                  color: AppColors.primary,
-                  icon: Icon(toggleIcon),
-                ),
-              ],
-            ),
+        if (expanded) ...children,
+        const Divider(height: 1),
       ],
     );
   }

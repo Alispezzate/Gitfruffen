@@ -14,6 +14,12 @@ class RepositoryTab extends Equatable {
     this.stashes = const [],
     this.hasMoreGraph = false,
     this.isLoadingMoreGraph = false,
+    this.stagedDiff = const DiffResult(files: []),
+    this.unstagedDiff = const DiffResult(files: []),
+    this.selectedCommitOid,
+    this.commitDiff,
+    this.isLoadingCommitDiff = false,
+    this.diffFailure,
   });
 
   final GitRepository repository;
@@ -32,6 +38,24 @@ class RepositoryTab extends Equatable {
   /// Whether a follow-up graph page is being fetched.
   final bool isLoadingMoreGraph;
 
+  /// Differences staged in the index against HEAD.
+  final DiffResult stagedDiff;
+
+  /// Differences in the working tree against the index.
+  final DiffResult unstagedDiff;
+
+  /// Commit whose diff is shown, or `null` when none is selected.
+  final GitOid? selectedCommitOid;
+
+  /// Diff of [selectedCommitOid], or `null` while it is loading or unset.
+  final DiffResult? commitDiff;
+
+  /// Whether [commitDiff] is being fetched.
+  final bool isLoadingCommitDiff;
+
+  /// Failure from loading [commitDiff].
+  final GitFailure? diffFailure;
+
   List<Branch> get localBranches =>
       branches.where((b) => b.kind == BranchKind.local).toList();
 
@@ -48,6 +72,15 @@ class RepositoryTab extends Equatable {
     List<StashEntry>? stashes,
     bool? hasMoreGraph,
     bool? isLoadingMoreGraph,
+    DiffResult? stagedDiff,
+    DiffResult? unstagedDiff,
+    GitOid? selectedCommitOid,
+    DiffResult? commitDiff,
+    bool? isLoadingCommitDiff,
+    GitFailure? diffFailure,
+    bool clearSelection = false,
+    bool clearCommitDiff = false,
+    bool clearDiffFailure = false,
   }) => RepositoryTab(
     repository: repository ?? this.repository,
     status: status ?? this.status,
@@ -58,6 +91,14 @@ class RepositoryTab extends Equatable {
     stashes: stashes ?? this.stashes,
     hasMoreGraph: hasMoreGraph ?? this.hasMoreGraph,
     isLoadingMoreGraph: isLoadingMoreGraph ?? this.isLoadingMoreGraph,
+    stagedDiff: stagedDiff ?? this.stagedDiff,
+    unstagedDiff: unstagedDiff ?? this.unstagedDiff,
+    selectedCommitOid: clearSelection
+        ? null
+        : (selectedCommitOid ?? this.selectedCommitOid),
+    commitDiff: clearCommitDiff ? null : (commitDiff ?? this.commitDiff),
+    isLoadingCommitDiff: isLoadingCommitDiff ?? this.isLoadingCommitDiff,
+    diffFailure: clearDiffFailure ? null : (diffFailure ?? this.diffFailure),
   );
 
   @override
@@ -71,6 +112,12 @@ class RepositoryTab extends Equatable {
     stashes,
     hasMoreGraph,
     isLoadingMoreGraph,
+    stagedDiff,
+    unstagedDiff,
+    selectedCommitOid,
+    commitDiff,
+    isLoadingCommitDiff,
+    diffFailure,
   ];
 }
 

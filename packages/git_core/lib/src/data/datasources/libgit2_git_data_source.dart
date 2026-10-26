@@ -2,6 +2,7 @@ import 'package:git2dart/git2dart.dart' as libgit2;
 import 'package:git_core/src/data/datasources/git_data_source.dart';
 import 'package:git_core/src/domain/entities/branch.dart';
 import 'package:git_core/src/domain/entities/commit.dart';
+import 'package:git_core/src/domain/entities/diff.dart';
 import 'package:git_core/src/domain/entities/git_oid.dart';
 import 'package:git_core/src/domain/entities/git_repository.dart';
 import 'package:git_core/src/domain/entities/git_reset_mode.dart';
@@ -853,4 +854,161 @@ final class Libgit2GitDataSource implements GitDataSource {
 
   @override
   Future<void> dispose({required String path}) async {}
+
+  @override
+  Future<DiffResult> diffCommit({
+    required String path,
+    required GitOid oid,
+  }) async => _withRepository(path, (repository) {
+    final commit = libgit2.Commit.lookup(
+      repo: repository,
+      oid: repository[oid.value],
+    );
+    libgit2.Commit? parent;
+    libgit2.Tree? oldTree;
+    libgit2.Tree? newTree;
+    try {
+      newTree = commit.tree;
+      if (commit.parents.isNotEmpty) {
+        parent = commit.parent(0);
+        oldTree = parent.tree;
+      }
+      final diff = libgit2.Diff.treeToTree(
+        repo: repository,
+        oldTree: oldTree,
+        newTree: newTree,
+      );
+      try {
+        if (diff.length > 0) {
+          diff.findSimilar();
+        }
+        return _toDiffResult(diff);
+      } finally {
+        diff.free();
+      }
+    } finally {
+      oldTree?.free();
+      newTree?.free();
+      parent?.free();
+      commit.free();
+    }
+  });
+
+  @override
+  Future<DiffResult> diffWorkingTree({
+    required String path,
+    required bool staged,
+  }) async => _withRepository(path, (repository) {
+    final index = repository.index;
+    libgit2.Commit? head;
+    libgit2.Tree? headTree;
+    try {
+      head = _headCommit(repository);
+      headTree = head?.tree;
+      final diff = staged
+          ? libgit2.Diff.treeToIndex(
+              repo: repository,
+              tree: headTree,
+              index: index,
+            )
+          : libgit2.Diff.indexToWorkdir(
+              repo: repository,
+              index: index,
+              flags: const {
+                libgit2.GitDiff.includeUntracked,
+                libgit2.GitDiff.recurseUntrackedDirs,
+                libgit2.GitDiff.showUntrackedContent,
+              },
+            );
+      try {
+        if (staged && diff.length > 0) {
+          diff.findSimilar();
+        }
+        return _toDiffResult(diff);
+      } finally {
+        diff.free();
+      }
+    } finally {
+      headTree?.free();
+      head?.free();
+      index.free();
+    }
+  });
+
+  /// Maps a native diff into immutable domain entities.
+  ///
+  /// Every patch is released as soon as it has been mapped; the caller owns
+  /// and frees [diff].
+  DiffResult _toDiffResult(libgit2.Diff diff) {
+    final files = <DiffFile>[];
+    for (var index = 0; index < diff.length; index++) {
+      final patch = libgit2.Patch.fromDiff(diff: diff, index: index);
+      try {
+        files.add(_toDiffFile(patch));
+      } finally {
+        patch.free();
+      }
+    }
+    return DiffResult(files: files);
+  }
+
+  DiffFile _toDiffFile(libgit2.Patch patch) {
+    final delta = patch.delta;
+    final newPath = delta.newFile.path;
+    final path = newPath.isEmpty ? delta.oldFile.path : newPath;
+    final oldPath = delta.oldFile.path;
+    final stats = patch.stats;
+
+    return DiffFile(
+      path: path,
+      oldPath: oldPath.isNotEmpty && oldPath != path ? oldPath : null,
+      changeType: _changeType(delta.status),
+      isBinary: delta.flags.contains(libgit2.GitDiffFlag.binary),
+      insertions: stats.insertions,
+      deletions: stats.deletions,
+      hunks: [
+        for (final hunk in patch.hunks)
+          DiffHunk(
+            header: hunk.header.trim(),
+            lines: hunk.lines.map(_toDiffLine).nonNulls.toList(),
+          ),
+      ],
+    );
+  }
+
+  DiffLine? _toDiffLine(libgit2.DiffLine line) {
+    final kind = _lineKind(line.origin);
+    if (kind == null) {
+      return null;
+    }
+    return DiffLine(
+      kind: kind,
+      content: _withoutTrailingNewline(line.content),
+      oldLine: _lineNumber(line.oldLineNumber),
+      newLine: _lineNumber(line.newLineNumber),
+    );
+  }
+
+  DiffLineKind? _lineKind(libgit2.GitDiffLine origin) => switch (origin) {
+    libgit2.GitDiffLine.context => DiffLineKind.context,
+    libgit2.GitDiffLine.addition => DiffLineKind.added,
+    libgit2.GitDiffLine.deletion => DiffLineKind.removed,
+    _ => null,
+  };
+
+  int? _lineNumber(int value) => value < 0 ? null : value;
+
+  String _withoutTrailingNewline(String content) => content.endsWith('\n')
+      ? content.substring(0, content.length - 1)
+      : content;
+
+  FileChangeType _changeType(libgit2.GitDelta delta) => switch (delta) {
+    libgit2.GitDelta.added ||
+    libgit2.GitDelta.untracked => FileChangeType.added,
+    libgit2.GitDelta.deleted => FileChangeType.deleted,
+    libgit2.GitDelta.renamed ||
+    libgit2.GitDelta.copied => FileChangeType.renamed,
+    libgit2.GitDelta.conflicted => FileChangeType.conflicted,
+    _ => FileChangeType.modified,
+  };
 }

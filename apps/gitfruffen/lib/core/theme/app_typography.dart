@@ -36,7 +36,7 @@ abstract final class AppTypography {
       textTheme(AppColors.textPrimary, AppColors.textSecondary);
 
   static TextTheme get light =>
-      textTheme(const Color(0xFF1B1D23), const Color(0xFF5B6373));
+      textTheme(const Color(0xFF1F2328), const Color(0xFF656D76));
 
   static const String fontFamily = _family;
 }

@@ -49,6 +49,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cloneConfirmButton => 'Clone';
 
   @override
+  String get cloneTabSubtitle =>
+      'Clone a remote repository into a local folder.';
+
+  @override
+  String get newRepositoryMenuItem => 'New repository…';
+
+  @override
+  String get newRepositoryTab => 'New';
+
+  @override
+  String get newRepositoryDialogTitle => 'New repository';
+
+  @override
+  String get newRepositorySubtitle =>
+      'Create a new Git repository in an empty or existing folder.';
+
+  @override
+  String get newRepositoryConfirmButton => 'Create';
+
+  @override
   String get recentTitle => 'Recent';
 
   @override
@@ -87,6 +107,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refreshTooltip => 'Refresh';
+
+  @override
+  String get fetchTooltip => 'Fetch';
 
   @override
   String get stagedLabel => 'Staged';
@@ -237,6 +260,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commitButton => 'Commit';
 
   @override
+  String changesOnBranch(int count, String branch) {
+    return '$count file changes on $branch';
+  }
+
+  @override
+  String get pathView => 'Path';
+
+  @override
+  String get treeView => 'Tree';
+
+  @override
+  String get stageAllChanges => 'Stage All Changes';
+
+  @override
+  String get unstageAllChanges => 'Unstage All Changes';
+
+  @override
+  String get unstagedFiles => 'Unstaged Files';
+
+  @override
+  String get stagedFiles => 'Staged Files';
+
+  @override
+  String get commitSummaryLabel => 'Commit summary';
+
+  @override
+  String get commitDescriptionLabel => 'Description';
+
+  @override
+  String get amendPreviousCommit => 'Amend previous commit';
+
+  @override
+  String get backToChanges => 'Back to changes';
+
+  @override
+  String get closeFileView => 'Close file';
+
+  @override
+  String get diffBinaryFile => 'Binary file';
+
+  @override
+  String get diffNoChanges => 'No changes';
+
+  @override
+  String fileChangesSummary(int count) {
+    return '$count files changed';
+  }
+
+  @override
   String get emptyNoHistory => 'No history loaded';
 
   @override
@@ -250,6 +322,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String commitSubtitle(String oid, String author) {
     return '$oid · $author';
   }
+
+  @override
+  String get graphColumnDescription => 'Description';
+
+  @override
+  String get graphColumnAuthor => 'Author';
+
+  @override
+  String get graphColumnDate => 'Date';
+
+  @override
+  String get graphColumnSha => 'SHA';
+
+  @override
+  String get graphColumnBranchTag => 'BRANCH / TAG';
+
+  @override
+  String get graphColumnGraph => 'GRAPH';
+
+  @override
+  String get graphColumnMessage => 'COMMIT MESSAGE';
+
+  @override
+  String get wipLabel => 'WIP';
+
+  @override
+  String get commitDetailsEmpty => 'Select a commit';
+
+  @override
+  String get commitDetailsHint => 'Pick a commit in the graph to inspect it.';
+
+  @override
+  String get commitCommitterLabel => 'Committer';
+
+  @override
+  String get commitParentsLabel => 'Parents';
 
   @override
   String get settingsTitle => 'Settings';
@@ -288,12 +396,106 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsGitEngine => 'Git engine';
 
   @override
+  String get settingsGit => 'Git';
+
+  @override
+  String get settingsAbout => 'About';
+
+  @override
+  String get settingsAboutDescription =>
+      'A native desktop Git client built with Flutter.';
+
+  @override
   String libgit2Version(String version) {
     return 'libgit2: $version';
   }
 
   @override
   String get retryButton => 'Retry';
+
+  @override
+  String get commandPaletteHint => 'Type a command...';
+
+  @override
+  String get quickOpenHint => 'Search open repositories...';
+
+  @override
+  String get paletteNoResults => 'No results';
+
+  @override
+  String get copyShaButton => 'Copy SHA';
+
+  @override
+  String get menuFile => 'File';
+
+  @override
+  String get menuEdit => 'Edit';
+
+  @override
+  String get menuView => 'View';
+
+  @override
+  String get menuRepository => 'Repository';
+
+  @override
+  String get menuHelp => 'Help';
+
+  @override
+  String get menuOpenRepository => 'Open Repository';
+
+  @override
+  String get menuCloneRepository => 'Clone Repository';
+
+  @override
+  String get menuNewRepository => 'New Repository';
+
+  @override
+  String get menuCloseRepository => 'Close Repository';
+
+  @override
+  String get menuUndo => 'Undo';
+
+  @override
+  String get menuRedo => 'Redo';
+
+  @override
+  String get menuCommandPalette => 'Command Palette';
+
+  @override
+  String get menuSettings => 'Settings';
+
+  @override
+  String get menuAbout => 'About Gitfruffen';
+
+  @override
+  String get searchTooltip => 'Search';
+
+  @override
+  String get actionsTooltip => 'Actions';
+
+  @override
+  String get branchTooltip => 'Branch';
+
+  @override
+  String get popTooltip => 'Pop';
+
+  @override
+  String get terminalTitle => 'Terminal';
+
+  @override
+  String get terminalUnavailable => 'Terminal is not available in this build.';
+
+  @override
+  String get terminalToggleTooltip => 'Toggle terminal';
+
+  @override
+  String get closeTerminalTooltip => 'Close terminal';
+
+  @override
+  String get collapseTerminalTooltip => 'Collapse terminal';
+
+  @override
+  String get filterHint => 'Filter branches, worktrees and tags';
 
   @override
   String routeNotFound(String uri) {

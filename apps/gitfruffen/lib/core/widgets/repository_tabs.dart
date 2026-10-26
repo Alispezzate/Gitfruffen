@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gitfruffen/core/services/file_picker_service.dart';
 import 'package:gitfruffen/core/theme/app_colors.dart';
 import 'package:gitfruffen/core/theme/app_theme.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_event.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
+import 'package:gitfruffen/features/repository/presentation/dialogs/repository_dialogs.dart';
 import 'package:gitfruffen/l10n/generated/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 /// Horizontal strip of open repositories shown above the feature content.
 ///
-/// Each tab switches the active repository; the trailing button browses for a
-/// new folder without leaving the current screen.
+/// Each tab switches the active repository; the trailing add menu opens, clones
+/// or initialises a repository without leaving the current screen.
 class RepositoryTabs extends StatelessWidget {
   const RepositoryTabs({super.key});
 
@@ -30,7 +31,7 @@ class RepositoryTabs extends StatelessWidget {
     );
 
     return Container(
-      height: 40,
+      height: AppTheme.tabHeight,
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         border: Border(bottom: BorderSide(color: theme.dividerColor)),
@@ -46,9 +47,12 @@ class RepositoryTabs extends StatelessWidget {
                 return _RepositoryTabTile(
                   tab: tab,
                   selected: tab.repository.path == activePath,
-                  onSelect: () => context.read<RepositoryBloc>().add(
-                    RepositoryTabSelected(tab.repository.path),
-                  ),
+                  onSelect: () {
+                    context.read<RepositoryBloc>().add(
+                      RepositoryTabSelected(tab.repository.path),
+                    );
+                    context.go('/repository');
+                  },
                   onClose: () => context.read<RepositoryBloc>().add(
                     RepositoryTabClosed(tab.repository.path),
                   ),
@@ -83,7 +87,7 @@ class _RepositoryTabTile extends StatelessWidget {
 
     return Material(
       color: selected
-          ? AppColors.primary.withValues(alpha: 0.16)
+          ? AppColors.primary.withValues(alpha: 0.12)
           : Colors.transparent,
       child: InkWell(
         onTap: onSelect,
@@ -112,7 +116,7 @@ class _RepositoryTabTile extends StatelessWidget {
                 child: Text(
                   tab.repository.name,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodyLarge?.copyWith(
+                  style: theme.textTheme.bodyMedium?.copyWith(
                     color: selected ? AppColors.primary : null,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                   ),
@@ -157,38 +161,40 @@ class _ChangeBadge extends StatelessWidget {
   );
 }
 
+enum _AddRepositoryAction { open, clone, create }
+
 class _AddRepositoryButton extends StatelessWidget {
   const _AddRepositoryButton();
 
-  Future<void> _browse(BuildContext context) async {
-    final l10n = AppLocalizations.of(context);
-    final picker = context.read<FilePickerService>();
-    final path = await picker.pickDirectory(
-      title: l10n.openRepositoryDialogTitle,
-    );
-    if (path == null || !context.mounted) {
-      return;
-    }
-    context.read<RepositoryBloc>().add(RepositoryOpened(path));
-  }
-
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 8),
-    child: Tooltip(
-      message: AppLocalizations.of(context).openRepositoryTooltip,
-      child: OutlinedButton.icon(
-        onPressed: () => _browse(context),
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size(0, 28),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radius),
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: PopupMenuButton<_AddRepositoryAction>(
+        tooltip: l10n.openRepositoryTooltip,
+        icon: const Icon(Icons.add, size: 18),
+        padding: EdgeInsets.zero,
+        onSelected: (action) => switch (action) {
+          _AddRepositoryAction.open => openRepositoryDialog(context),
+          _AddRepositoryAction.clone => showCloneRepositoryDialog(context),
+          _AddRepositoryAction.create => showNewRepositoryDialog(context),
+        },
+        itemBuilder: (context) => [
+          PopupMenuItem(
+            value: _AddRepositoryAction.open,
+            child: Text(l10n.openButton),
           ),
-        ),
-        icon: const Icon(Icons.add, size: 16),
-        label: Text(AppLocalizations.of(context).openButton),
+          PopupMenuItem(
+            value: _AddRepositoryAction.clone,
+            child: Text(l10n.cloneButton),
+          ),
+          PopupMenuItem(
+            value: _AddRepositoryAction.create,
+            child: Text(l10n.newRepositoryMenuItem),
+          ),
+        ],
       ),
-    ),
-  );
+    );
+  }
 }

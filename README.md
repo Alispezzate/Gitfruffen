@@ -1,8 +1,8 @@
 # Gitfruffen
 
 A modern Git client for desktop (Windows, macOS, Linux) built with Flutter.
-Gitfruffen aims to replace GitKraken's UI/UX while keeping the raw performance
-of a native Flutter application.
+Gitfruffen targets a fast, native desktop experience with a compact three-pane
+workspace and a focus on raw performance.
 
 ## Architecture
 
@@ -52,7 +52,7 @@ melos run build:macos   # or build:windows / build:linux
 
 ## Project layout
 
-```
+```text
 Gitfruffen/
 ├── apps/gitfruffen/        # Flutter desktop app
 │   └── lib/

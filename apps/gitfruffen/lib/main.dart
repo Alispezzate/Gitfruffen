@@ -10,7 +10,7 @@ Future<void> main() async {
   await windowManager.waitUntilReadyToShow(
     const WindowOptions(
       size: Size(1440, 900),
-      minimumSize: Size(1024, 640),
+      minimumSize: Size(900, 600),
       center: true,
       title: 'Gitfruffen',
     ),

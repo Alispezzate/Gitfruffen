@@ -66,6 +66,36 @@
     "description": "Confirm action of the clone dialog."
   },
 
+  "cloneTabSubtitle": "Clone a remote repository into a local folder.",
+  "@cloneTabSubtitle": {
+    "description": "Helper text of the clone tab on the welcome card."
+  },
+
+  "newRepositoryMenuItem": "New repository…",
+  "@newRepositoryMenuItem": {
+    "description": "Add menu item that initialises a repository."
+  },
+
+  "newRepositoryTab": "New",
+  "@newRepositoryTab": {
+    "description": "Welcome card tab that initialises a repository."
+  },
+
+  "newRepositoryDialogTitle": "New repository",
+  "@newRepositoryDialogTitle": {
+    "description": "Title of the new repository dialog."
+  },
+
+  "newRepositorySubtitle": "Create a new Git repository in an empty or existing folder.",
+  "@newRepositorySubtitle": {
+    "description": "Helper text of the new repository tab."
+  },
+
+  "newRepositoryConfirmButton": "Create",
+  "@newRepositoryConfirmButton": {
+    "description": "Confirm action of the new repository dialog."
+  },
+
   "recentTitle": "Recent",
   "@recentTitle": {
     "description": "Header of the recent repositories list."
@@ -129,6 +159,11 @@
   "refreshTooltip": "Refresh",
   "@refreshTooltip": {
     "description": "Tooltip of the refresh action."
+  },
+
+  "fetchTooltip": "Fetch",
+  "@fetchTooltip": {
+    "description": "Toolbar action that fetches the default remote."
   },
 
   "stagedLabel": "Staged",
@@ -387,6 +422,94 @@
     "description": "Action that creates a commit from the index."
   },
 
+  "changesOnBranch": "{count} file changes on {branch}",
+  "@changesOnBranch": {
+    "description": "Header of the working tree changes panel.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+
+  "pathView": "Path",
+  "@pathView": {
+    "description": "Option that lists changed files by their full path."
+  },
+
+  "treeView": "Tree",
+  "@treeView": {
+    "description": "Option that groups changed files by directory."
+  },
+
+  "stageAllChanges": "Stage All Changes",
+  "@stageAllChanges": {
+    "description": "Action that stages every unstaged change."
+  },
+
+  "unstageAllChanges": "Unstage All Changes",
+  "@unstageAllChanges": {
+    "description": "Action that unstages every staged change."
+  },
+
+  "unstagedFiles": "Unstaged Files",
+  "@unstagedFiles": {
+    "description": "Header of the unstaged changes section."
+  },
+
+  "stagedFiles": "Staged Files",
+  "@stagedFiles": {
+    "description": "Header of the staged changes section."
+  },
+
+  "commitSummaryLabel": "Commit summary",
+  "@commitSummaryLabel": {
+    "description": "Placeholder of the commit summary field."
+  },
+
+  "commitDescriptionLabel": "Description",
+  "@commitDescriptionLabel": {
+    "description": "Placeholder of the commit description field."
+  },
+
+  "amendPreviousCommit": "Amend previous commit",
+  "@amendPreviousCommit": {
+    "description": "Checkbox that amends the HEAD commit."
+  },
+
+  "backToChanges": "Back to changes",
+  "@backToChanges": {
+    "description": "Tooltip of the back button in diff and commit views."
+  },
+
+  "closeFileView": "Close file",
+  "@closeFileView": {
+    "description": "Tooltip of the close button when a file diff is open."
+  },
+
+  "diffBinaryFile": "Binary file",
+  "@diffBinaryFile": {
+    "description": "Shown instead of a diff for binary files."
+  },
+
+  "diffNoChanges": "No changes",
+  "@diffNoChanges": {
+    "description": "Shown when a file or commit has no diff."
+  },
+
+  "fileChangesSummary": "{count} files changed",
+  "@fileChangesSummary": {
+    "description": "Number of files changed by the selected commit.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
   "emptyNoHistory": "No history loaded",
   "@emptyNoHistory": {
     "description": "Empty state title on the history page."
@@ -413,6 +536,66 @@
         "type": "String"
       }
     }
+  },
+
+  "graphColumnDescription": "Description",
+  "@graphColumnDescription": {
+    "description": "Commit graph column header for the commit summary."
+  },
+
+  "graphColumnAuthor": "Author",
+  "@graphColumnAuthor": {
+    "description": "Commit graph column header for the author."
+  },
+
+  "graphColumnDate": "Date",
+  "@graphColumnDate": {
+    "description": "Commit graph column header for the date."
+  },
+
+  "graphColumnSha": "SHA",
+  "@graphColumnSha": {
+    "description": "Commit graph column header for the short object id."
+  },
+
+  "graphColumnBranchTag": "BRANCH / TAG",
+  "@graphColumnBranchTag": {
+    "description": "Commit graph column header for branch and tag labels."
+  },
+
+  "graphColumnGraph": "GRAPH",
+  "@graphColumnGraph": {
+    "description": "Commit graph column header for the lane graph."
+  },
+
+  "graphColumnMessage": "COMMIT MESSAGE",
+  "@graphColumnMessage": {
+    "description": "Commit graph column header for the commit summary."
+  },
+
+  "wipLabel": "WIP",
+  "@wipLabel": {
+    "description": "Label of the work-in-progress row above the commit graph."
+  },
+
+  "commitDetailsEmpty": "Select a commit",
+  "@commitDetailsEmpty": {
+    "description": "Empty state title of the commit details panel."
+  },
+
+  "commitDetailsHint": "Pick a commit in the graph to inspect it.",
+  "@commitDetailsHint": {
+    "description": "Empty state message of the commit details panel."
+  },
+
+  "commitCommitterLabel": "Committer",
+  "@commitCommitterLabel": {
+    "description": "Label of the committer identity in the commit details panel."
+  },
+
+  "commitParentsLabel": "Parents",
+  "@commitParentsLabel": {
+    "description": "Label of the parent commits in the commit details panel."
   },
 
   "settingsTitle": "Settings",
@@ -475,6 +658,21 @@
     "description": "Settings section with the engine version."
   },
 
+  "settingsGit": "Git",
+  "@settingsGit": {
+    "description": "Settings section for repositories and the Git engine."
+  },
+
+  "settingsAbout": "About",
+  "@settingsAbout": {
+    "description": "Settings section with application information."
+  },
+
+  "settingsAboutDescription": "A native desktop Git client built with Flutter.",
+  "@settingsAboutDescription": {
+    "description": "Short description shown in the about settings section."
+  },
+
   "libgit2Version": "libgit2: {version}",
   "@libgit2Version": {
     "description": "Engine version label.",
@@ -488,6 +686,146 @@
   "retryButton": "Retry",
   "@retryButton": {
     "description": "Generic retry action on error views."
+  },
+
+  "commandPaletteHint": "Type a command...",
+  "@commandPaletteHint": {
+    "description": "Placeholder of the command palette search field."
+  },
+
+  "quickOpenHint": "Search open repositories...",
+  "@quickOpenHint": {
+    "description": "Placeholder of the quick open palette search field."
+  },
+
+  "paletteNoResults": "No results",
+  "@paletteNoResults": {
+    "description": "Empty state of the command palette list."
+  },
+
+  "copyShaButton": "Copy SHA",
+  "@copyShaButton": {
+    "description": "Commit context menu action that copies the full object id."
+  },
+
+  "menuFile": "File",
+  "@menuFile": {
+    "description": "Application menu that groups repository file actions."
+  },
+
+  "menuEdit": "Edit",
+  "@menuEdit": {
+    "description": "Application menu that groups editing actions."
+  },
+
+  "menuView": "View",
+  "@menuView": {
+    "description": "Application menu that groups view actions."
+  },
+
+  "menuRepository": "Repository",
+  "@menuRepository": {
+    "description": "View menu action that returns to the repository workspace."
+  },
+
+  "menuHelp": "Help",
+  "@menuHelp": {
+    "description": "Application menu that groups help actions."
+  },
+
+  "menuOpenRepository": "Open Repository",
+  "@menuOpenRepository": {
+    "description": "File menu action that opens a local repository."
+  },
+
+  "menuCloneRepository": "Clone Repository",
+  "@menuCloneRepository": {
+    "description": "File menu action that clones a remote repository."
+  },
+
+  "menuNewRepository": "New Repository",
+  "@menuNewRepository": {
+    "description": "File menu action that initialises a repository."
+  },
+
+  "menuCloseRepository": "Close Repository",
+  "@menuCloseRepository": {
+    "description": "File menu action that closes the active repository."
+  },
+
+  "menuUndo": "Undo",
+  "@menuUndo": {
+    "description": "Edit menu action that moves HEAD back."
+  },
+
+  "menuRedo": "Redo",
+  "@menuRedo": {
+    "description": "Edit menu action that re-applies an undone HEAD move."
+  },
+
+  "menuCommandPalette": "Command Palette",
+  "@menuCommandPalette": {
+    "description": "View menu action that opens the command palette."
+  },
+
+  "menuSettings": "Settings",
+  "@menuSettings": {
+    "description": "View menu action that opens the settings page."
+  },
+
+  "menuAbout": "About Gitfruffen",
+  "@menuAbout": {
+    "description": "Help menu action that opens the about dialog."
+  },
+
+  "searchTooltip": "Search",
+  "@searchTooltip": {
+    "description": "Tooltip of the search button in the workspace header."
+  },
+
+  "actionsTooltip": "Actions",
+  "@actionsTooltip": {
+    "description": "Tooltip of the extra actions menu in the workspace header."
+  },
+
+  "branchTooltip": "Branch",
+  "@branchTooltip": {
+    "description": "Label and tooltip of the branch action in the workspace header."
+  },
+
+  "popTooltip": "Pop",
+  "@popTooltip": {
+    "description": "Label and tooltip of the stash pop action in the workspace header."
+  },
+
+  "terminalTitle": "Terminal",
+  "@terminalTitle": {
+    "description": "Title of the terminal panel."
+  },
+
+  "terminalUnavailable": "Terminal is not available in this build.",
+  "@terminalUnavailable": {
+    "description": "Placeholder shown in the terminal panel."
+  },
+
+  "terminalToggleTooltip": "Toggle terminal",
+  "@terminalToggleTooltip": {
+    "description": "Tooltip of the terminal toggle button in the workspace header."
+  },
+
+  "closeTerminalTooltip": "Close terminal",
+  "@closeTerminalTooltip": {
+    "description": "Tooltip of the terminal panel close button."
+  },
+
+  "collapseTerminalTooltip": "Collapse terminal",
+  "@collapseTerminalTooltip": {
+    "description": "Tooltip of the terminal panel collapse button when it is expanded."
+  },
+
+  "filterHint": "Filter branches, worktrees and tags",
+  "@filterHint": {
+    "description": "Placeholder of the sidebar filter field."
   },
 
   "routeNotFound": "Route not found: {uri}",

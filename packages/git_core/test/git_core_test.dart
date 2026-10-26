@@ -194,4 +194,67 @@ void main() {
       expect(mapper.toResetMode(GitResetMode.soft), libgit2.GitReset.soft);
     });
   });
+
+  group('DiffResult', () {
+    test('sums insertions and deletions across files', () {
+      const result = DiffResult(
+        files: [
+          DiffFile(
+            path: 'a.dart',
+            changeType: FileChangeType.modified,
+            isBinary: false,
+            insertions: 2,
+            deletions: 1,
+          ),
+          DiffFile(
+            path: 'b.dart',
+            changeType: FileChangeType.added,
+            isBinary: false,
+            insertions: 3,
+            deletions: 0,
+          ),
+        ],
+      );
+
+      expect(result.insertions, 5);
+      expect(result.deletions, 1);
+      expect(result.isEmpty, isFalse);
+      expect(const DiffResult(files: []).isEmpty, isTrue);
+    });
+  });
+
+  group('FakeGitDataSource diffs', () {
+    test('returns deterministic commit diffs', () async {
+      final dataSource = FakeGitDataSource(latency: Duration.zero);
+      final result = await dataSource.diffCommit(
+        path: '/tmp/repo',
+        oid: const GitOid('a1b2c3d4e5f60718293a4b5c6d7e8f9012345678'),
+      );
+
+      expect(result.files, hasLength(2));
+      expect(result.files.every((file) => file.hunks.isNotEmpty), isTrue);
+      expect(result.insertions, 3);
+      expect(result.deletions, 1);
+    });
+
+    test('returns different files for staged and unstaged changes', () async {
+      final dataSource = FakeGitDataSource(latency: Duration.zero);
+
+      final staged = await dataSource.diffWorkingTree(
+        path: '/tmp/repo',
+        staged: true,
+      );
+      final unstaged = await dataSource.diffWorkingTree(
+        path: '/tmp/repo',
+        staged: false,
+      );
+
+      expect(staged.files.map((file) => file.path), contains('lib/main.dart'));
+      expect(unstaged.files.map((file) => file.path), contains('lib/app.dart'));
+      expect(
+        staged.files.map((file) => file.path).toSet(),
+        isNot(equals(unstaged.files.map((file) => file.path).toSet())),
+      );
+    });
+  });
 }

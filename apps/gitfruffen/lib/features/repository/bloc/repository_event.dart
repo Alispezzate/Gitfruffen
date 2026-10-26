@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:git_core/git_core.dart';
 
 /// Events accepted by `RepositoryBloc`.
 sealed class RepositoryEvent extends Equatable {
@@ -11,6 +12,16 @@ sealed class RepositoryEvent extends Equatable {
 /// Opens (or re-opens) the repository at [path] in a new tab.
 final class RepositoryOpened extends RepositoryEvent {
   const RepositoryOpened(this.path);
+
+  final String path;
+
+  @override
+  List<Object?> get props => [path];
+}
+
+/// Initialises a new repository at [path] and opens it in a new tab.
+final class RepositoryInitialized extends RepositoryEvent {
+  const RepositoryInitialized(this.path);
 
   final String path;
 
@@ -61,6 +72,11 @@ final class RepositoryRefreshed extends RepositoryEvent {
   List<Object?> get props => [path];
 }
 
+/// Fetches the default remote into the active repository without moving HEAD.
+final class RepositoryFetched extends RepositoryEvent {
+  const RepositoryFetched();
+}
+
 /// Appends the next page of the commit graph for the active tab.
 final class RepositoryGraphLoadMore extends RepositoryEvent {
   const RepositoryGraphLoadMore();
@@ -101,14 +117,31 @@ final class AllFilesUnstaged extends RepositoryEvent {
   const AllFilesUnstaged();
 }
 
-/// Creates a commit with [message] from the current index.
+/// Creates a commit with [message] from the current index, amending HEAD when
+/// [amend] is true.
 final class CommitSubmitted extends RepositoryEvent {
-  const CommitSubmitted(this.message);
+  const CommitSubmitted(this.message, {this.amend = false});
 
   final String message;
+  final bool amend;
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, amend];
+}
+
+/// Selects [oid] in the commit graph and loads its diff.
+final class CommitSelected extends RepositoryEvent {
+  const CommitSelected(this.oid);
+
+  final GitOid oid;
+
+  @override
+  List<Object?> get props => [oid];
+}
+
+/// Clears the selected commit and its diff.
+final class CommitSelectionCleared extends RepositoryEvent {
+  const CommitSelectionCleared();
 }
 
 /// Checks out [branch] in the active repository.

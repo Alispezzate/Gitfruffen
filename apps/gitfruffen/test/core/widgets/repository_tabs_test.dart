@@ -8,6 +8,7 @@ import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_event.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
 import 'package:gitfruffen/l10n/generated/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockGitRepository extends Mock implements GitRepositoryContract {}
@@ -89,6 +90,12 @@ void main() {
       () => repository.reflog(path: any(named: 'path')),
     ).thenAnswer((_) async => const <ReflogEntry>[]);
     when(
+      () => repository.diffWorkingTree(
+        path: any(named: 'path'),
+        staged: any(named: 'staged'),
+      ),
+    ).thenAnswer((_) async => const DiffResult(files: []));
+    when(
       () => repository.dispose(path: any(named: 'path')),
     ).thenAnswer((_) async {});
     when(
@@ -103,18 +110,27 @@ void main() {
     WidgetTester tester, {
     required RepositoryState state,
   }) async {
+    final router = GoRouter(
+      initialLocation: '/repository',
+      routes: [
+        GoRoute(
+          path: '/repository',
+          builder: (context, _) => BlocBuilder<RepositoryBloc, RepositoryState>(
+            builder: (context, _) => const Scaffold(body: RepositoryTabs()),
+          ),
+        ),
+      ],
+    );
     await tester.pumpWidget(
       MultiRepositoryProvider(
         providers: [RepositoryProvider<FilePickerService>.value(value: picker)],
         child: BlocProvider<RepositoryBloc>(
           create: (_) =>
               RepositoryBloc(repository: repository, workspace: workspace),
-          child: MaterialApp(
+          child: MaterialApp.router(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            home: BlocBuilder<RepositoryBloc, RepositoryState>(
-              builder: (context, _) => const Scaffold(body: RepositoryTabs()),
-            ),
+            routerConfig: router,
           ),
         ),
       ),
@@ -135,7 +151,7 @@ void main() {
   testWidgets('renders nothing when no repository is open', (tester) async {
     await pumpTabs(tester, state: const RepositoryInitial());
 
-    expect(find.byType(OutlinedButton), findsNothing);
+    expect(find.byIcon(Icons.add), findsNothing);
     expect(find.text('alpha'), findsNothing);
   });
 
@@ -203,9 +219,7 @@ void main() {
     expect(find.text('beta'), findsOneWidget);
   });
 
-  testWidgets('the Open button browses and opens the picked folder', (
-    tester,
-  ) async {
+  testWidgets('the add menu opens and opens the picked folder', (tester) async {
     when(
       () => picker.pickDirectory(title: any(named: 'title')),
     ).thenAnswer((_) async => pathB);
@@ -218,6 +232,8 @@ void main() {
       ),
     );
 
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
 

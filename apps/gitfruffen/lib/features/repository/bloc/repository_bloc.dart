@@ -16,10 +16,12 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
        _workspace = workspace,
        super(const RepositoryInitial()) {
     on<RepositoryOpened>(_onOpened);
+    on<RepositoryInitialized>(_onInitialized);
     on<RepositoryCloned>(_onCloned);
     on<RepositoryTabSelected>(_onTabSelected);
     on<RepositoryTabClosed>(_onTabClosed);
     on<RepositoryRefreshed>(_onRefreshed);
+    on<RepositoryFetched>(_onFetched);
     on<RepositoryGraphLoadMore>(_onGraphLoadMore);
     on<RepositoryClosed>(_onClosed);
     on<FilesStaged>(_onFilesStaged);
@@ -27,6 +29,8 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
     on<AllFilesStaged>(_onAllFilesStaged);
     on<AllFilesUnstaged>(_onAllFilesUnstaged);
     on<CommitSubmitted>(_onCommitSubmitted);
+    on<CommitSelected>(_onCommitSelected);
+    on<CommitSelectionCleared>(_onCommitSelectionCleared);
     on<BranchCheckedOut>(_onBranchCheckedOut);
     on<BranchCreated>(_onBranchCreated);
     on<BranchDeleted>(_onBranchDeleted);
@@ -84,6 +88,28 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
     } on Object catch (error, stackTrace) {
       _emitFailure(
         UnexpectedGitFailure('Unable to open ${event.path}', cause: error),
+        emit,
+      );
+      addError(error, stackTrace);
+    }
+  }
+
+  Future<void> _onInitialized(
+    RepositoryInitialized event,
+    Emitter<RepositoryState> emit,
+  ) async {
+    emit(RepositoryLoading(tabs: state.tabs, activePath: state.activePath));
+    try {
+      final repo = await _repository.init(path: event.path);
+      await _openTab(repo, emit);
+    } on GitFailure catch (failure) {
+      _emitFailure(failure, emit);
+    } on Object catch (error, stackTrace) {
+      _emitFailure(
+        UnexpectedGitFailure(
+          'Unable to initialise ${event.path}',
+          cause: error,
+        ),
         emit,
       );
       addError(error, stackTrace);
@@ -154,6 +180,8 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
       _repository.worktrees(path: path),
       _repository.stashes(path: path),
       _repository.reflog(path: path),
+      _repository.diffWorkingTree(path: path, staged: true),
+      _repository.diffWorkingTree(path: path, staged: false),
     ]);
 
     final status = results[0] as RepositoryStatus;
@@ -163,10 +191,12 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
     final worktrees = results[4] as List<WorktreeInfo>;
     final stashes = results[5] as List<StashEntry>;
     final reflog = results[6] as List<ReflogEntry>;
+    final stagedDiff = results[7] as DiffResult;
+    final unstagedDiff = results[8] as DiffResult;
 
     if (resetHistory || !_undo.containsKey(path)) {
       _undo[path] = [
-        for (final entry in reflog)
+        for (final entry in reflog.reversed)
           if (entry.oldOid.value != _zeroOid) entry.oldOid,
       ];
       _redo[path] = [];
@@ -181,6 +211,8 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
       worktrees: worktrees,
       stashes: stashes,
       hasMoreGraph: graph.length == _graphPageSize,
+      stagedDiff: stagedDiff,
+      unstagedDiff: unstagedDiff,
     );
   }
 
@@ -241,11 +273,16 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
         emit,
         resetHistory: true,
       );
-      _replaceTab(refreshed, emit);
+      _replaceTab(refreshed, emit, clearBusy: true);
     } on GitFailure catch (failure) {
       _emitFailure(failure, emit);
     }
   }
+
+  Future<void> _onFetched(
+    RepositoryFetched event,
+    Emitter<RepositoryState> emit,
+  ) => _mutate(emit, (path) => _repository.fetch(path: path));
 
   Future<void> _onGraphLoadMore(
     RepositoryGraphLoadMore event,
@@ -258,22 +295,39 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
         tab.graph.isEmpty) {
       return;
     }
+    final path = tab.repository.path;
+    final capturedLength = tab.graph.length;
+    final capturedLast = tab.graph.last.oid;
     _replaceTab(tab.copyWith(isLoadingMoreGraph: true), emit);
     try {
       final next = await _repository.graph(
-        path: tab.repository.path,
+        path: path,
         limit: _graphPageSize,
-        from: tab.graph.last.oid,
+        from: capturedLast,
       );
+      final current = _resolve(path);
+      if (current == null) {
+        return;
+      }
+      if (current.graph.length != capturedLength ||
+          current.graph.isEmpty ||
+          current.graph.last.oid != capturedLast) {
+        _replaceTab(current.copyWith(isLoadingMoreGraph: false), emit);
+        return;
+      }
       _replaceTab(
-        tab.copyWith(
-          graph: [...tab.graph, ...next],
+        current.copyWith(
+          graph: [...current.graph, ...next],
           hasMoreGraph: next.length == _graphPageSize,
           isLoadingMoreGraph: false,
         ),
         emit,
       );
     } on GitFailure catch (failure) {
+      final current = _resolve(path);
+      if (current != null) {
+        _replaceTab(current.copyWith(isLoadingMoreGraph: false), emit);
+      }
       _emitFailure(failure, emit);
     }
   }
@@ -331,8 +385,73 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
     }
     return _mutate(
       emit,
-      (path) => _repository.commit(path: path, message: message),
+      (path) =>
+          _repository.commit(path: path, message: message, amend: event.amend),
       changesHead: true,
+    );
+  }
+
+  Future<void> _onCommitSelected(
+    CommitSelected event,
+    Emitter<RepositoryState> emit,
+  ) async {
+    final tab = _resolve(null);
+    if (tab == null) {
+      return;
+    }
+    if (tab.selectedCommitOid == event.oid && tab.commitDiff != null) {
+      return;
+    }
+    _replaceTab(
+      tab.copyWith(
+        selectedCommitOid: event.oid,
+        clearCommitDiff: true,
+        isLoadingCommitDiff: true,
+        clearDiffFailure: true,
+      ),
+      emit,
+    );
+    try {
+      final diff = await _repository.diffCommit(
+        path: tab.repository.path,
+        oid: event.oid,
+      );
+      final current = _resolve(tab.repository.path);
+      if (current?.selectedCommitOid != event.oid) {
+        return;
+      }
+      _replaceTab(
+        current!.copyWith(commitDiff: diff, isLoadingCommitDiff: false),
+        emit,
+      );
+    } on GitFailure catch (failure) {
+      final current = _resolve(tab.repository.path);
+      if (current?.selectedCommitOid != event.oid) {
+        return;
+      }
+      _replaceTab(
+        current!.copyWith(isLoadingCommitDiff: false, diffFailure: failure),
+        emit,
+      );
+    }
+  }
+
+  void _onCommitSelectionCleared(
+    CommitSelectionCleared event,
+    Emitter<RepositoryState> emit,
+  ) {
+    final tab = _resolve(null);
+    if (tab == null || tab.selectedCommitOid == null) {
+      return;
+    }
+    _replaceTab(
+      tab.copyWith(
+        clearSelection: true,
+        clearCommitDiff: true,
+        clearDiffFailure: true,
+        isLoadingCommitDiff: false,
+      ),
+      emit,
     );
   }
 
@@ -471,6 +590,7 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
     if (stack.isEmpty) {
       return;
     }
+    final current = tab.status.headCommit?.oid;
     final target = stack.last;
     await _mutate(
       emit,
@@ -481,7 +601,9 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
       ),
       onSuccess: () {
         _redo[path] = stack.sublist(0, stack.length - 1);
-        _undo[path] = [...?_undo[path], target];
+        if (current != null) {
+          _undo[path] = [...?_undo[path], current];
+        }
       },
     );
   }
@@ -500,8 +622,8 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
   /// Runs [operation] against the active repository, toggling the busy flag and
   /// reloading the workspace on success.
   ///
-  /// When [changesHead] is true the current HEAD is pushed onto the undo stack
-  /// and the redo stack is cleared before the operation runs.
+  /// When [changesHead] is true the previous HEAD is pushed onto the undo stack
+  /// and the redo stack is cleared, but only once the operation succeeds.
   Future<void> _mutate(
     Emitter<RepositoryState> emit,
     Future<void> Function(String path) operation, {
@@ -514,18 +636,18 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
       return;
     }
     final path = tab.repository.path;
-    if (changesHead) {
-      final current = tab.status.headCommit?.oid;
-      if (current != null) {
-        _undo[path] = [...?_undo[path], current];
-      }
-      _redo[path] = [];
-    }
+    final previousHead = changesHead ? tab.status.headCommit?.oid : null;
     emit(ready.copyWith(isBusy: true));
     try {
       await operation(path);
+      if (changesHead) {
+        if (previousHead != null) {
+          _undo[path] = [...?_undo[path], previousHead];
+        }
+        _redo[path] = [];
+      }
       final refreshed = await _loadWorkspace(tab.repository, emit);
-      _replaceTab(refreshed, emit);
+      _replaceTab(refreshed, emit, clearBusy: true);
       onSuccess?.call();
     } on GitFailure catch (failure) {
       _emitFailure(failure, emit, ready: ready);
@@ -554,8 +676,12 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
   }
 
   /// Replaces the tab matching [tab]'s path, preserving tab order and the
-  /// active path.
-  void _replaceTab(RepositoryTab tab, Emitter<RepositoryState> emit) {
+  /// active path. The busy flag is preserved unless [clearBusy] is true.
+  void _replaceTab(
+    RepositoryTab tab,
+    Emitter<RepositoryState> emit, {
+    bool clearBusy = false,
+  }) {
     final ready = state;
     final activePath = ready.activePath;
     if (ready is! RepositoryReady || activePath == null) {
@@ -570,7 +696,7 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
             else
               current,
         ],
-        isBusy: false,
+        isBusy: !clearBusy && ready.isBusy,
       ),
     );
   }

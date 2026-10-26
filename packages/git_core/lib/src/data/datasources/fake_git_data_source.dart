@@ -1,6 +1,7 @@
 import 'package:git_core/src/data/datasources/git_data_source.dart';
 import 'package:git_core/src/domain/entities/branch.dart';
 import 'package:git_core/src/domain/entities/commit.dart';
+import 'package:git_core/src/domain/entities/diff.dart';
 import 'package:git_core/src/domain/entities/git_oid.dart';
 import 'package:git_core/src/domain/entities/git_repository.dart';
 import 'package:git_core/src/domain/entities/git_reset_mode.dart';
@@ -399,4 +400,216 @@ final class FakeGitDataSource implements GitDataSource {
 
   @override
   Future<void> dispose({required String path}) async {}
+
+  @override
+  Future<DiffResult> diffCommit({
+    required String path,
+    required GitOid oid,
+  }) async {
+    await Future<void>.delayed(latency);
+    return DiffResult(
+      files: [
+        DiffFile(
+          path: 'lib/main.dart',
+          changeType: FileChangeType.modified,
+          isBinary: false,
+          insertions: 1,
+          deletions: 1,
+          hunks: [
+            DiffHunk(
+              header: '@@ -1,3 +1,3 @@',
+              lines: [
+                DiffLine(
+                  kind: DiffLineKind.context,
+                  content: '// diff for ${oid.short}',
+                  oldLine: 1,
+                  newLine: 1,
+                ),
+                const DiffLine(
+                  kind: DiffLineKind.removed,
+                  content: "  print('before');",
+                  oldLine: 2,
+                ),
+                const DiffLine(
+                  kind: DiffLineKind.added,
+                  content: "  print('after');",
+                  newLine: 2,
+                ),
+                const DiffLine(
+                  kind: DiffLineKind.context,
+                  content: '}',
+                  oldLine: 3,
+                  newLine: 3,
+                ),
+              ],
+            ),
+          ],
+        ),
+        const DiffFile(
+          path: 'test/main_test.dart',
+          changeType: FileChangeType.added,
+          isBinary: false,
+          insertions: 2,
+          deletions: 0,
+          hunks: [
+            DiffHunk(
+              header: '@@ -0,0 +1,2 @@',
+              lines: [
+                DiffLine(
+                  kind: DiffLineKind.added,
+                  content: "import 'package:test/test.dart';",
+                  newLine: 1,
+                ),
+                DiffLine(
+                  kind: DiffLineKind.added,
+                  content: 'void main() {}',
+                  newLine: 2,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  @override
+  Future<DiffResult> diffWorkingTree({
+    required String path,
+    required bool staged,
+  }) async {
+    await Future<void>.delayed(latency);
+    return staged ? _stagedDiff : _unstagedDiff;
+  }
+
+  static const DiffResult _stagedDiff = DiffResult(
+    files: [
+      DiffFile(
+        path: 'lib/main.dart',
+        changeType: FileChangeType.modified,
+        isBinary: false,
+        insertions: 2,
+        deletions: 1,
+        hunks: [
+          DiffHunk(
+            header: '@@ -1,3 +1,4 @@',
+            lines: [
+              DiffLine(
+                kind: DiffLineKind.context,
+                content: 'void main() {',
+                oldLine: 1,
+                newLine: 1,
+              ),
+              DiffLine(
+                kind: DiffLineKind.removed,
+                content: "  print('hello');",
+                oldLine: 2,
+              ),
+              DiffLine(
+                kind: DiffLineKind.added,
+                content: "  print('hello, world');",
+                newLine: 2,
+              ),
+              DiffLine(
+                kind: DiffLineKind.added,
+                content: '  runApp();',
+                newLine: 3,
+              ),
+              DiffLine(
+                kind: DiffLineKind.context,
+                content: '}',
+                oldLine: 3,
+                newLine: 4,
+              ),
+            ],
+          ),
+        ],
+      ),
+      DiffFile(
+        path: 'README.md',
+        changeType: FileChangeType.modified,
+        isBinary: false,
+        insertions: 1,
+        deletions: 1,
+        hunks: [
+          DiffHunk(
+            header: '@@ -1 +1 @@',
+            lines: [
+              DiffLine(
+                kind: DiffLineKind.removed,
+                content: '# Gitfruffen',
+                oldLine: 1,
+              ),
+              DiffLine(
+                kind: DiffLineKind.added,
+                content: '# Gitfruffen (staged)',
+                newLine: 1,
+              ),
+            ],
+          ),
+        ],
+      ),
+    ],
+  );
+
+  static const DiffResult _unstagedDiff = DiffResult(
+    files: [
+      DiffFile(
+        path: 'lib/app.dart',
+        changeType: FileChangeType.modified,
+        isBinary: false,
+        insertions: 1,
+        deletions: 0,
+        hunks: [
+          DiffHunk(
+            header: '@@ -1,2 +1,3 @@',
+            lines: [
+              DiffLine(
+                kind: DiffLineKind.context,
+                content: 'class App {}',
+                oldLine: 1,
+                newLine: 1,
+              ),
+              DiffLine(
+                kind: DiffLineKind.added,
+                content: '// working tree change',
+                newLine: 2,
+              ),
+              DiffLine(
+                kind: DiffLineKind.context,
+                content: '// end',
+                oldLine: 2,
+                newLine: 3,
+              ),
+            ],
+          ),
+        ],
+      ),
+      DiffFile(
+        path: 'README.md',
+        changeType: FileChangeType.added,
+        isBinary: false,
+        insertions: 3,
+        deletions: 0,
+        hunks: [
+          DiffHunk(
+            header: '@@ -0,0 +1,3 @@',
+            lines: [
+              DiffLine(
+                kind: DiffLineKind.added,
+                content: '# Notes',
+                newLine: 1,
+              ),
+              DiffLine(kind: DiffLineKind.added, content: '', newLine: 2),
+              DiffLine(
+                kind: DiffLineKind.added,
+                content: '- untracked content',
+                newLine: 3,
+              ),
+            ],
+          ),
+        ],
+      ),
+    ],
+  );
 }

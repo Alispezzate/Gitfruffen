@@ -13,8 +13,8 @@ class CommitGraphPainter extends CustomPainter {
     required this.row,
     required this.laneCount,
     required this.palette,
-    this.rowHeight = 64,
-    this.laneWidth = 18,
+    this.rowHeight = 32,
+    this.laneWidth = 16,
     this.topInset = 0,
   });
 

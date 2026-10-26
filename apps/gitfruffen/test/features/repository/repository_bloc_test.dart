@@ -17,6 +17,10 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(
+      const GitOid('0000000000000000000000000000000000000000'),
+    );
+    registerFallbackValue(GitResetMode.hard);
+    registerFallbackValue(
       const GitRepository(
         path: '',
         name: '',
@@ -52,6 +56,17 @@ void main() {
     changes: [],
     currentBranchName: 'stale',
     headCommit: null,
+  );
+  const commitDiff = DiffResult(
+    files: [
+      DiffFile(
+        path: 'a.dart',
+        changeType: FileChangeType.modified,
+        isBinary: false,
+        insertions: 1,
+        deletions: 0,
+      ),
+    ],
   );
 
   Commit commit(String sha, {List<String> parents = const []}) => Commit(
@@ -121,6 +136,12 @@ void main() {
     when(
       () => repository.reflog(path: any(named: 'path')),
     ).thenAnswer((_) async => const <ReflogEntry>[]);
+    when(
+      () => repository.diffWorkingTree(
+        path: any(named: 'path'),
+        staged: any(named: 'staged'),
+      ),
+    ).thenAnswer((_) async => const DiffResult(files: []));
   });
 
   RepositoryBloc build() =>
@@ -144,6 +165,25 @@ void main() {
     ],
     verify: (_) {
       verify(() => workspace.rememberRecentRepository(repoA)).called(1);
+    },
+  );
+
+  blocTest<RepositoryBloc, RepositoryState>(
+    'initialises a repository and opens it in a tab',
+    setUp: () {
+      when(() => repository.init(path: pathA)).thenAnswer((_) async => repoA);
+    },
+    build: build,
+    act: (bloc) => bloc.add(const RepositoryInitialized(pathA)),
+    expect: () => [
+      const RepositoryLoading(),
+      const RepositoryReady(
+        tabs: [RepositoryTab(repository: repoA, status: status)],
+        activePath: pathA,
+      ),
+    ],
+    verify: (_) {
+      verify(() => repository.init(path: pathA)).called(1);
     },
   );
 
@@ -373,6 +413,7 @@ void main() {
         () => repository.commit(
           path: pathA,
           message: any(named: 'message'),
+          amend: any(named: 'amend'),
         ),
       ).thenAnswer((_) async => commit('a' * 40));
     },
@@ -395,6 +436,109 @@ void main() {
     ],
     verify: (_) {
       verify(() => repository.commit(path: pathA, message: 'hello')).called(1);
+    },
+  );
+
+  blocTest<RepositoryBloc, RepositoryState>(
+    'CommitSelected emits the loading selection then the commit diff',
+    setUp: () {
+      when(
+        () => repository.diffCommit(
+          path: pathA,
+          oid: any(named: 'oid'),
+        ),
+      ).thenAnswer((_) async => commitDiff);
+    },
+    build: build,
+    seed: () => RepositoryReady(
+      tabs: [
+        tab(graph: [commit('c' * 40)]),
+      ],
+      activePath: pathA,
+    ),
+    act: (bloc) => bloc.add(CommitSelected(GitOid('c' * 40))),
+    expect: () => [
+      RepositoryReady(
+        tabs: [
+          tab(graph: [commit('c' * 40)]).copyWith(
+            selectedCommitOid: GitOid('c' * 40),
+            isLoadingCommitDiff: true,
+          ),
+        ],
+        activePath: pathA,
+      ),
+      RepositoryReady(
+        tabs: [
+          tab(graph: [commit('c' * 40)]).copyWith(
+            selectedCommitOid: GitOid('c' * 40),
+            commitDiff: commitDiff,
+            isLoadingCommitDiff: false,
+          ),
+        ],
+        activePath: pathA,
+      ),
+    ],
+    verify: (_) {
+      verify(
+        () => repository.diffCommit(path: pathA, oid: GitOid('c' * 40)),
+      ).called(1);
+    },
+  );
+
+  blocTest<RepositoryBloc, RepositoryState>(
+    'CommitSelectionCleared clears the selected commit and its diff',
+    build: build,
+    seed: () => RepositoryReady(
+      tabs: [
+        tab(
+          graph: [commit('c' * 40)],
+        ).copyWith(selectedCommitOid: GitOid('c' * 40), commitDiff: commitDiff),
+      ],
+      activePath: pathA,
+    ),
+    act: (bloc) => bloc.add(const CommitSelectionCleared()),
+    expect: () => [
+      RepositoryReady(
+        tabs: [
+          tab(graph: [commit('c' * 40)]),
+        ],
+        activePath: pathA,
+      ),
+    ],
+  );
+
+  blocTest<RepositoryBloc, RepositoryState>(
+    'creating a commit forwards amend',
+    setUp: () {
+      when(
+        () => repository.commit(
+          path: pathA,
+          message: any(named: 'message'),
+          amend: any(named: 'amend'),
+        ),
+      ).thenAnswer((_) async => commit('a' * 40));
+    },
+    build: build,
+    seed: () => const RepositoryReady(
+      tabs: [RepositoryTab(repository: repoA, status: status)],
+      activePath: pathA,
+    ),
+    act: (bloc) => bloc.add(const CommitSubmitted('hello', amend: true)),
+    expect: () => [
+      const RepositoryReady(
+        tabs: [RepositoryTab(repository: repoA, status: status)],
+        activePath: pathA,
+        isBusy: true,
+      ),
+      const RepositoryReady(
+        tabs: [RepositoryTab(repository: repoA, status: status)],
+        activePath: pathA,
+      ),
+    ],
+    verify: (_) {
+      verify(
+        () => repository.commit(path: pathA, message: 'hello', amend: true),
+      ).called(1);
     },
   );
 
@@ -510,6 +654,147 @@ void main() {
     expect: () => [const RepositoryInitial()],
     verify: (_) {
       verify(() => repository.dispose(path: pathA)).called(1);
+    },
+  );
+
+  blocTest<RepositoryBloc, RepositoryState>(
+    'a failing graph load-more clears the loading flag and surfaces the failure',
+    setUp: () {
+      when(
+        () => repository.graph(path: pathA, limit: 50, from: graph.last.oid),
+      ).thenThrow(const NetworkFailure('offline'));
+    },
+    build: build,
+    seed: () => RepositoryReady(
+      tabs: [tab(graph: graph, hasMoreGraph: true)],
+      activePath: pathA,
+    ),
+    act: (bloc) => bloc.add(const RepositoryGraphLoadMore()),
+    expect: () => [
+      RepositoryReady(
+        tabs: [
+          tab(
+            graph: graph,
+            hasMoreGraph: true,
+          ).copyWith(isLoadingMoreGraph: true),
+        ],
+        activePath: pathA,
+      ),
+      RepositoryReady(
+        tabs: [tab(graph: graph, hasMoreGraph: true)],
+        activePath: pathA,
+      ),
+      RepositoryReady(
+        tabs: [tab(graph: graph, hasMoreGraph: true)],
+        activePath: pathA,
+        failure: const NetworkFailure('offline'),
+      ),
+    ],
+  );
+
+  blocTest<RepositoryBloc, RepositoryState>(
+    'commit selection preserves the busy lock',
+    setUp: () {
+      when(
+        () => repository.diffCommit(
+          path: pathA,
+          oid: any(named: 'oid'),
+        ),
+      ).thenAnswer((_) async => commitDiff);
+    },
+    build: build,
+    seed: () => RepositoryReady(
+      tabs: [
+        tab(graph: [commit('c' * 40)]),
+      ],
+      activePath: pathA,
+      isBusy: true,
+    ),
+    act: (bloc) => bloc.add(CommitSelected(GitOid('c' * 40))),
+    expect: () => [
+      RepositoryReady(
+        tabs: [
+          tab(graph: [commit('c' * 40)]).copyWith(
+            selectedCommitOid: GitOid('c' * 40),
+            isLoadingCommitDiff: true,
+          ),
+        ],
+        activePath: pathA,
+        isBusy: true,
+      ),
+      RepositoryReady(
+        tabs: [
+          tab(graph: [commit('c' * 40)]).copyWith(
+            selectedCommitOid: GitOid('c' * 40),
+            commitDiff: commitDiff,
+            isLoadingCommitDiff: false,
+          ),
+        ],
+        activePath: pathA,
+        isBusy: true,
+      ),
+    ],
+  );
+
+  blocTest<RepositoryBloc, RepositoryState>(
+    'undo resets to the most recent previous HEAD from the reflog',
+    setUp: () {
+      final signature = Signature(
+        name: 'Ada Lovelace',
+        email: 'ada@gitfruffen.dev',
+        when: DateTime.utc(2026),
+      );
+      final headStatus = RepositoryStatus(
+        changes: const [],
+        currentBranchName: 'main',
+        headCommit: commit('f' * 40),
+      );
+      when(
+        () => repository.discover(startPath: pathA),
+      ).thenAnswer((_) async => repoA);
+      when(
+        () => repository.status(path: pathA),
+      ).thenAnswer((_) async => headStatus);
+      when(() => repository.reflog(path: pathA)).thenAnswer(
+        (_) async => [
+          ReflogEntry(
+            oldOid: GitOid('b' * 40),
+            newOid: GitOid('f' * 40),
+            message: 'commit',
+            committer: signature,
+          ),
+          ReflogEntry(
+            oldOid: GitOid('a' * 40),
+            newOid: GitOid('b' * 40),
+            message: 'commit',
+            committer: signature,
+          ),
+        ],
+      );
+      when(
+        () => repository.resetTo(
+          path: pathA,
+          oid: any(named: 'oid'),
+          mode: any(named: 'mode'),
+        ),
+      ).thenAnswer((_) async {});
+    },
+    build: build,
+    act: (bloc) async {
+      final ready = bloc.stream.firstWhere((state) => state is RepositoryReady);
+      bloc.add(const RepositoryOpened(pathA));
+      await ready;
+      bloc.add(const UndoRequested());
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    },
+    verify: (_) {
+      verify(
+        () => repository.resetTo(
+          path: pathA,
+          oid: 'b' * 40,
+          mode: GitResetMode.mixed,
+        ),
+      ).called(1);
     },
   );
 }

@@ -1,6 +1,7 @@
 import 'package:git_core/src/data/datasources/git_data_source.dart';
 import 'package:git_core/src/domain/entities/branch.dart';
 import 'package:git_core/src/domain/entities/commit.dart';
+import 'package:git_core/src/domain/entities/diff.dart';
 import 'package:git_core/src/domain/entities/git_oid.dart';
 import 'package:git_core/src/domain/entities/git_repository.dart';
 import 'package:git_core/src/domain/entities/git_reset_mode.dart';
@@ -182,6 +183,16 @@ final class GitRepositoryImpl implements GitRepositoryContract {
     required String oid,
     GitResetMode mode = GitResetMode.hard,
   }) => _dataSource.resetTo(path: path, oid: oid, mode: mode);
+
+  @override
+  Future<DiffResult> diffCommit({required String path, required GitOid oid}) =>
+      _dataSource.diffCommit(path: path, oid: oid);
+
+  @override
+  Future<DiffResult> diffWorkingTree({
+    required String path,
+    required bool staged,
+  }) => _dataSource.diffWorkingTree(path: path, staged: staged);
 
   @override
   Future<void> dispose({required String path}) =>

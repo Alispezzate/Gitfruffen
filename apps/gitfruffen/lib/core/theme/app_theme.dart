@@ -5,8 +5,15 @@ import 'package:gitfruffen/core/theme/app_typography.dart';
 
 /// Builds the light and dark [ThemeData] used across Gitfruffen.
 abstract final class AppTheme {
-  static const double radius = 8;
-  static const double sidebarWidth = 260;
+  static const double radius = 4;
+  static const double menuBarHeight = 30;
+  static const double workspaceHeaderHeight = 52;
+  static const double terminalHeaderHeight = 32;
+  static const double terminalBodyHeight = 180;
+  static const double sidebarWidth = 280;
+  static const double statusBarHeight = 26;
+  static const double tabHeight = 36;
+  static const double graphRowHeight = 32;
 
   static ThemeData get dark => _build(
     brightness: Brightness.dark,

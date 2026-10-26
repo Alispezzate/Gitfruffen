@@ -1,5 +1,6 @@
 import 'package:git_core/src/domain/entities/branch.dart';
 import 'package:git_core/src/domain/entities/commit.dart';
+import 'package:git_core/src/domain/entities/diff.dart';
 import 'package:git_core/src/domain/entities/git_oid.dart';
 import 'package:git_core/src/domain/entities/git_repository.dart';
 import 'package:git_core/src/domain/entities/git_reset_mode.dart';
@@ -142,6 +143,17 @@ abstract interface class GitRepositoryContract {
     required String path,
     required String oid,
     GitResetMode mode = GitResetMode.hard,
+  });
+
+  /// Returns the diff introduced by [oid] against its first parent.
+  /// Root commits are diffed against the empty tree.
+  Future<DiffResult> diffCommit({required String path, required GitOid oid});
+
+  /// Returns staged (index vs HEAD) or unstaged (working tree vs index)
+  /// differences.
+  Future<DiffResult> diffWorkingTree({
+    required String path,
+    required bool staged,
   });
 
   /// Releases any native resources associated with [path].

@@ -176,6 +176,42 @@ abstract class AppLocalizations {
   /// **'Clone'**
   String get cloneConfirmButton;
 
+  /// Helper text of the clone tab on the welcome card.
+  ///
+  /// In en, this message translates to:
+  /// **'Clone a remote repository into a local folder.'**
+  String get cloneTabSubtitle;
+
+  /// Add menu item that initialises a repository.
+  ///
+  /// In en, this message translates to:
+  /// **'New repository…'**
+  String get newRepositoryMenuItem;
+
+  /// Welcome card tab that initialises a repository.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get newRepositoryTab;
+
+  /// Title of the new repository dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'New repository'**
+  String get newRepositoryDialogTitle;
+
+  /// Helper text of the new repository tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new Git repository in an empty or existing folder.'**
+  String get newRepositorySubtitle;
+
+  /// Confirm action of the new repository dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get newRepositoryConfirmButton;
+
   /// Header of the recent repositories list.
   ///
   /// In en, this message translates to:
@@ -253,6 +289,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Refresh'**
   String get refreshTooltip;
+
+  /// Toolbar action that fetches the default remote.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch'**
+  String get fetchTooltip;
 
   /// Stat chip label for staged changes.
   ///
@@ -530,6 +572,96 @@ abstract class AppLocalizations {
   /// **'Commit'**
   String get commitButton;
 
+  /// Header of the working tree changes panel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} file changes on {branch}'**
+  String changesOnBranch(int count, String branch);
+
+  /// Option that lists changed files by their full path.
+  ///
+  /// In en, this message translates to:
+  /// **'Path'**
+  String get pathView;
+
+  /// Option that groups changed files by directory.
+  ///
+  /// In en, this message translates to:
+  /// **'Tree'**
+  String get treeView;
+
+  /// Action that stages every unstaged change.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage All Changes'**
+  String get stageAllChanges;
+
+  /// Action that unstages every staged change.
+  ///
+  /// In en, this message translates to:
+  /// **'Unstage All Changes'**
+  String get unstageAllChanges;
+
+  /// Header of the unstaged changes section.
+  ///
+  /// In en, this message translates to:
+  /// **'Unstaged Files'**
+  String get unstagedFiles;
+
+  /// Header of the staged changes section.
+  ///
+  /// In en, this message translates to:
+  /// **'Staged Files'**
+  String get stagedFiles;
+
+  /// Placeholder of the commit summary field.
+  ///
+  /// In en, this message translates to:
+  /// **'Commit summary'**
+  String get commitSummaryLabel;
+
+  /// Placeholder of the commit description field.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get commitDescriptionLabel;
+
+  /// Checkbox that amends the HEAD commit.
+  ///
+  /// In en, this message translates to:
+  /// **'Amend previous commit'**
+  String get amendPreviousCommit;
+
+  /// Tooltip of the back button in diff and commit views.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to changes'**
+  String get backToChanges;
+
+  /// Tooltip of the close button when a file diff is open.
+  ///
+  /// In en, this message translates to:
+  /// **'Close file'**
+  String get closeFileView;
+
+  /// Shown instead of a diff for binary files.
+  ///
+  /// In en, this message translates to:
+  /// **'Binary file'**
+  String get diffBinaryFile;
+
+  /// Shown when a file or commit has no diff.
+  ///
+  /// In en, this message translates to:
+  /// **'No changes'**
+  String get diffNoChanges;
+
+  /// Number of files changed by the selected commit.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} files changed'**
+  String fileChangesSummary(int count);
+
   /// Empty state title on the history page.
   ///
   /// In en, this message translates to:
@@ -553,6 +685,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{oid} · {author}'**
   String commitSubtitle(String oid, String author);
+
+  /// Commit graph column header for the commit summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get graphColumnDescription;
+
+  /// Commit graph column header for the author.
+  ///
+  /// In en, this message translates to:
+  /// **'Author'**
+  String get graphColumnAuthor;
+
+  /// Commit graph column header for the date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get graphColumnDate;
+
+  /// Commit graph column header for the short object id.
+  ///
+  /// In en, this message translates to:
+  /// **'SHA'**
+  String get graphColumnSha;
+
+  /// Commit graph column header for branch and tag labels.
+  ///
+  /// In en, this message translates to:
+  /// **'BRANCH / TAG'**
+  String get graphColumnBranchTag;
+
+  /// Commit graph column header for the lane graph.
+  ///
+  /// In en, this message translates to:
+  /// **'GRAPH'**
+  String get graphColumnGraph;
+
+  /// Commit graph column header for the commit summary.
+  ///
+  /// In en, this message translates to:
+  /// **'COMMIT MESSAGE'**
+  String get graphColumnMessage;
+
+  /// Label of the work-in-progress row above the commit graph.
+  ///
+  /// In en, this message translates to:
+  /// **'WIP'**
+  String get wipLabel;
+
+  /// Empty state title of the commit details panel.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a commit'**
+  String get commitDetailsEmpty;
+
+  /// Empty state message of the commit details panel.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a commit in the graph to inspect it.'**
+  String get commitDetailsHint;
+
+  /// Label of the committer identity in the commit details panel.
+  ///
+  /// In en, this message translates to:
+  /// **'Committer'**
+  String get commitCommitterLabel;
+
+  /// Label of the parent commits in the commit details panel.
+  ///
+  /// In en, this message translates to:
+  /// **'Parents'**
+  String get commitParentsLabel;
 
   /// Page title of the settings page.
   ///
@@ -626,6 +830,24 @@ abstract class AppLocalizations {
   /// **'Git engine'**
   String get settingsGitEngine;
 
+  /// Settings section for repositories and the Git engine.
+  ///
+  /// In en, this message translates to:
+  /// **'Git'**
+  String get settingsGit;
+
+  /// Settings section with application information.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsAbout;
+
+  /// Short description shown in the about settings section.
+  ///
+  /// In en, this message translates to:
+  /// **'A native desktop Git client built with Flutter.'**
+  String get settingsAboutDescription;
+
   /// Engine version label.
   ///
   /// In en, this message translates to:
@@ -637,6 +859,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get retryButton;
+
+  /// Placeholder of the command palette search field.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a command...'**
+  String get commandPaletteHint;
+
+  /// Placeholder of the quick open palette search field.
+  ///
+  /// In en, this message translates to:
+  /// **'Search open repositories...'**
+  String get quickOpenHint;
+
+  /// Empty state of the command palette list.
+  ///
+  /// In en, this message translates to:
+  /// **'No results'**
+  String get paletteNoResults;
+
+  /// Commit context menu action that copies the full object id.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy SHA'**
+  String get copyShaButton;
+
+  /// Application menu that groups repository file actions.
+  ///
+  /// In en, this message translates to:
+  /// **'File'**
+  String get menuFile;
+
+  /// Application menu that groups editing actions.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get menuEdit;
+
+  /// Application menu that groups view actions.
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get menuView;
+
+  /// View menu action that returns to the repository workspace.
+  ///
+  /// In en, this message translates to:
+  /// **'Repository'**
+  String get menuRepository;
+
+  /// Application menu that groups help actions.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get menuHelp;
+
+  /// File menu action that opens a local repository.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Repository'**
+  String get menuOpenRepository;
+
+  /// File menu action that clones a remote repository.
+  ///
+  /// In en, this message translates to:
+  /// **'Clone Repository'**
+  String get menuCloneRepository;
+
+  /// File menu action that initialises a repository.
+  ///
+  /// In en, this message translates to:
+  /// **'New Repository'**
+  String get menuNewRepository;
+
+  /// File menu action that closes the active repository.
+  ///
+  /// In en, this message translates to:
+  /// **'Close Repository'**
+  String get menuCloseRepository;
+
+  /// Edit menu action that moves HEAD back.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get menuUndo;
+
+  /// Edit menu action that re-applies an undone HEAD move.
+  ///
+  /// In en, this message translates to:
+  /// **'Redo'**
+  String get menuRedo;
+
+  /// View menu action that opens the command palette.
+  ///
+  /// In en, this message translates to:
+  /// **'Command Palette'**
+  String get menuCommandPalette;
+
+  /// View menu action that opens the settings page.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get menuSettings;
+
+  /// Help menu action that opens the about dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'About Gitfruffen'**
+  String get menuAbout;
+
+  /// Tooltip of the search button in the workspace header.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get searchTooltip;
+
+  /// Tooltip of the extra actions menu in the workspace header.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get actionsTooltip;
+
+  /// Label and tooltip of the branch action in the workspace header.
+  ///
+  /// In en, this message translates to:
+  /// **'Branch'**
+  String get branchTooltip;
+
+  /// Label and tooltip of the stash pop action in the workspace header.
+  ///
+  /// In en, this message translates to:
+  /// **'Pop'**
+  String get popTooltip;
+
+  /// Title of the terminal panel.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal'**
+  String get terminalTitle;
+
+  /// Placeholder shown in the terminal panel.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal is not available in this build.'**
+  String get terminalUnavailable;
+
+  /// Tooltip of the terminal toggle button in the workspace header.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle terminal'**
+  String get terminalToggleTooltip;
+
+  /// Tooltip of the terminal panel close button.
+  ///
+  /// In en, this message translates to:
+  /// **'Close terminal'**
+  String get closeTerminalTooltip;
+
+  /// Tooltip of the terminal panel collapse button when it is expanded.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse terminal'**
+  String get collapseTerminalTooltip;
+
+  /// Placeholder of the sidebar filter field.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter branches, worktrees and tags'**
+  String get filterHint;
 
   /// Fallback screen for unknown routes.
   ///

@@ -11,6 +11,7 @@ export 'src/data/datasources/libgit2_git_data_source.dart';
 export 'src/data/repositories/git_repository_impl.dart';
 export 'src/domain/entities/branch.dart';
 export 'src/domain/entities/commit.dart';
+export 'src/domain/entities/diff.dart';
 export 'src/domain/entities/git_oid.dart';
 export 'src/domain/entities/git_repository.dart';
 export 'src/domain/entities/git_reset_mode.dart';
