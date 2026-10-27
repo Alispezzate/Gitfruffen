@@ -1,4 +1,5 @@
 import 'package:git_core/src/data/datasources/git_data_source.dart';
+import 'package:git_core/src/domain/entities/blame.dart';
 import 'package:git_core/src/domain/entities/branch.dart';
 import 'package:git_core/src/domain/entities/commit.dart';
 import 'package:git_core/src/domain/entities/diff.dart';
@@ -57,6 +58,20 @@ final class GitRepositoryImpl implements GitRepositoryContract {
     int limit = 100,
     GitOid? from,
   }) => _dataSource.graph(path: path, limit: limit, from: from);
+
+  @override
+  Future<List<BlameLine>> blameFile({
+    required String path,
+    required String filePath,
+    GitOid? at,
+  }) => _dataSource.blameFile(path: path, filePath: filePath, at: at);
+
+  @override
+  Future<List<Commit>> fileHistory({
+    required String path,
+    required String filePath,
+    int limit = 50,
+  }) => _dataSource.fileHistory(path: path, filePath: filePath, limit: limit);
 
   @override
   Future<List<Branch>> branches({required String path}) =>
@@ -185,14 +200,30 @@ final class GitRepositoryImpl implements GitRepositoryContract {
   }) => _dataSource.resetTo(path: path, oid: oid, mode: mode);
 
   @override
-  Future<DiffResult> diffCommit({required String path, required GitOid oid}) =>
-      _dataSource.diffCommit(path: path, oid: oid);
+  Future<DiffResult> diffCommit({
+    required String path,
+    required GitOid oid,
+    bool ignoreWhitespace = false,
+    int contextLines = 3,
+  }) => _dataSource.diffCommit(
+    path: path,
+    oid: oid,
+    ignoreWhitespace: ignoreWhitespace,
+    contextLines: contextLines,
+  );
 
   @override
   Future<DiffResult> diffWorkingTree({
     required String path,
     required bool staged,
-  }) => _dataSource.diffWorkingTree(path: path, staged: staged);
+    bool ignoreWhitespace = false,
+    int contextLines = 3,
+  }) => _dataSource.diffWorkingTree(
+    path: path,
+    staged: staged,
+    ignoreWhitespace: ignoreWhitespace,
+    contextLines: contextLines,
+  );
 
   @override
   Future<void> dispose({required String path}) =>

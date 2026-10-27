@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:git_core/git_core.dart';
+import 'package:gitfruffen/features/repository/bloc/file_diff_state.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_event.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
@@ -78,7 +79,7 @@ void main() {
 
   testWidgets('asks the workspace to open a file diff', (tester) async {
     final bloc = _MockRepositoryBloc();
-    DiffFile? opened;
+    OpenFileRequest? opened;
     when(
       () => bloc.state,
     ).thenReturn(RepositoryReady(tabs: [tab], activePath: repository.path));
@@ -112,6 +113,8 @@ void main() {
     await tester.tap(find.text('lib/a.dart'));
     await tester.pumpAndSettle();
 
-    expect(opened?.path, 'lib/a.dart');
+    expect(opened?.file.path, 'lib/a.dart');
+    expect(opened?.source, FileDiffSource.commit);
+    expect(opened?.commitOid, commit.oid);
   });
 }

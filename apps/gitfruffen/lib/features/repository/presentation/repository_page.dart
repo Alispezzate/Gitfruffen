@@ -6,6 +6,8 @@ import 'package:git_core/git_core.dart';
 
 import 'package:gitfruffen/core/theme/app_theme.dart';
 import 'package:gitfruffen/core/widgets/app_feedback.dart';
+import 'package:gitfruffen/features/repository/bloc/file_diff_bloc.dart';
+import 'package:gitfruffen/features/repository/bloc/file_diff_state.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_event.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
@@ -84,7 +86,7 @@ class _WorkspaceState extends State<_Workspace> {
   double _rightWidth = 380;
   bool _terminalVisible = false;
   bool _terminalExpanded = true;
-  DiffFile? _openFile;
+  OpenFileRequest? _openFile;
 
   @override
   void didUpdateWidget(_Workspace oldWidget) {
@@ -150,10 +152,17 @@ class _WorkspaceState extends State<_Workspace> {
                               child: ColoredBox(
                                 color: theme.scaffoldBackgroundColor,
                                 child: _openFile != null
-                                    ? FileDiffView(
-                                        file: _openFile!,
-                                        onBack: () =>
-                                            setState(() => _openFile = null),
+                                    ? BlocProvider<FileDiffBloc>(
+                                        key: ValueKey(_openFile),
+                                        create: (context) => FileDiffBloc(
+                                          repository: context
+                                              .read<GitRepositoryContract>(),
+                                          request: _openFile!,
+                                        ),
+                                        child: FileDiffView(
+                                          onBack: () =>
+                                              setState(() => _openFile = null),
+                                        ),
                                       )
                                     : CommitGraphView(
                                         tab: widget.tab,
@@ -182,16 +191,16 @@ class _WorkspaceState extends State<_Workspace> {
                                 child: widget.tab.selectedCommitOid != null
                                     ? CommitDetailsPanel(
                                         tab: widget.tab,
-                                        onOpenFile: (file) =>
-                                            setState(() => _openFile = file),
+                                        onOpenFile: (request) =>
+                                            setState(() => _openFile = request),
                                       )
                                     : Column(
                                         children: [
                                           Expanded(
                                             child: ChangesPanel(
                                               tab: widget.tab,
-                                              onOpenFile: (file) => setState(
-                                                () => _openFile = file,
+                                              onOpenFile: (request) => setState(
+                                                () => _openFile = request,
                                               ),
                                             ),
                                           ),

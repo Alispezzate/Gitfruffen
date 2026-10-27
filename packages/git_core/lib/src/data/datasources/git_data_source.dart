@@ -1,3 +1,4 @@
+import 'package:git_core/src/domain/entities/blame.dart';
 import 'package:git_core/src/domain/entities/branch.dart';
 import 'package:git_core/src/domain/entities/commit.dart';
 import 'package:git_core/src/domain/entities/diff.dart';
@@ -35,6 +36,20 @@ abstract interface class GitDataSource {
   /// Unlike [log], this includes every branch head, which is what the commit
   /// graph needs to draw intersecting lines.
   Future<List<Commit>> graph({required String path, int limit, GitOid? from});
+
+  /// Returns one blame entry per line of [filePath], optionally at [at].
+  Future<List<BlameLine>> blameFile({
+    required String path,
+    required String filePath,
+    GitOid? at,
+  });
+
+  /// Returns commits that changed [filePath], newest first.
+  Future<List<Commit>> fileHistory({
+    required String path,
+    required String filePath,
+    int limit = 50,
+  });
 
   Future<List<Branch>> branches({required String path});
 
@@ -112,13 +127,20 @@ abstract interface class GitDataSource {
 
   /// Returns the diff introduced by [oid] against its first parent.
   /// Root commits are diffed against the empty tree.
-  Future<DiffResult> diffCommit({required String path, required GitOid oid});
+  Future<DiffResult> diffCommit({
+    required String path,
+    required GitOid oid,
+    bool ignoreWhitespace = false,
+    int contextLines = 3,
+  });
 
   /// Returns staged (index vs HEAD) or unstaged (working tree vs index)
   /// differences.
   Future<DiffResult> diffWorkingTree({
     required String path,
     required bool staged,
+    bool ignoreWhitespace = false,
+    int contextLines = 3,
   });
 
   Future<void> dispose({required String path});

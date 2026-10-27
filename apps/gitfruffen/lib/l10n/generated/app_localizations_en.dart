@@ -304,6 +304,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diffNoChanges => 'No changes';
 
   @override
+  String get diffBlame => 'Blame';
+
+  @override
+  String get diffHistory => 'History';
+
+  @override
+  String get diffPreviousChange => 'Previous change';
+
+  @override
+  String get diffNextChange => 'Next change';
+
+  @override
+  String get diffHunkView => 'Hunk view';
+
+  @override
+  String get diffInlineView => 'Inline view';
+
+  @override
+  String get diffSplitView => 'Split view';
+
+  @override
+  String get diffIgnoreWhitespace => 'Ignore whitespace';
+
+  @override
+  String get diffWordWrap => 'Word wrap';
+
+  @override
+  String get diffHistoryTitle => 'File history';
+
+  @override
+  String get diffHistoryEmpty => 'No commits touch this file.';
+
+  @override
+  String get diffHistoryLoading => 'Loading history...';
+
+  @override
+  String get diffBlameLoading => 'Loading blame...';
+
+  @override
+  String get diffBlameUnavailable => 'Blame unavailable';
+
+  @override
+  String diffUnchangedLines(int count) {
+    return '$count unchanged lines';
+  }
+
+  @override
   String fileChangesSummary(int count) {
     return '$count files changed';
   }

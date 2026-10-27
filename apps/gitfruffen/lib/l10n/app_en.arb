@@ -500,6 +500,86 @@
     "description": "Shown when a file or commit has no diff."
   },
 
+  "diffBlame": "Blame",
+  "@diffBlame": {
+    "description": "Toolbar toggle that shows blame authorship next to diff lines."
+  },
+
+  "diffHistory": "History",
+  "@diffHistory": {
+    "description": "Toolbar action that opens the file history dialog."
+  },
+
+  "diffPreviousChange": "Previous change",
+  "@diffPreviousChange": {
+    "description": "Tooltip of the action that jumps to the previous diff hunk."
+  },
+
+  "diffNextChange": "Next change",
+  "@diffNextChange": {
+    "description": "Tooltip of the action that jumps to the next diff hunk."
+  },
+
+  "diffHunkView": "Hunk view",
+  "@diffHunkView": {
+    "description": "Diff render mode that shows only changed lines."
+  },
+
+  "diffInlineView": "Inline view",
+  "@diffInlineView": {
+    "description": "Diff render mode that shows a unified inline diff."
+  },
+
+  "diffSplitView": "Split view",
+  "@diffSplitView": {
+    "description": "Diff render mode that shows old and new files side by side."
+  },
+
+  "diffIgnoreWhitespace": "Ignore whitespace",
+  "@diffIgnoreWhitespace": {
+    "description": "Toolbar toggle that hides whitespace-only changes."
+  },
+
+  "diffWordWrap": "Word wrap",
+  "@diffWordWrap": {
+    "description": "Toolbar toggle that wraps long diff lines."
+  },
+
+  "diffHistoryTitle": "File history",
+  "@diffHistoryTitle": {
+    "description": "Title of the dialog listing commits that changed the file."
+  },
+
+  "diffHistoryEmpty": "No commits touch this file.",
+  "@diffHistoryEmpty": {
+    "description": "Empty state of the file history dialog."
+  },
+
+  "diffHistoryLoading": "Loading history...",
+  "@diffHistoryLoading": {
+    "description": "Loading label of the file history dialog."
+  },
+
+  "diffBlameLoading": "Loading blame...",
+  "@diffBlameLoading": {
+    "description": "Loading label shown while blame data is fetched."
+  },
+
+  "diffBlameUnavailable": "Blame unavailable",
+  "@diffBlameUnavailable": {
+    "description": "Shown when blame data could not be loaded."
+  },
+
+  "diffUnchangedLines": "{count} unchanged lines",
+  "@diffUnchangedLines": {
+    "description": "Collapsed row summarising consecutive unchanged diff lines.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
   "fileChangesSummary": "{count} files changed",
   "@fileChangesSummary": {
     "description": "Number of files changed by the selected commit.",

@@ -1,5 +1,6 @@
 import 'package:git2dart/git2dart.dart' as libgit2;
 import 'package:git_core/src/data/datasources/git_data_source.dart';
+import 'package:git_core/src/domain/entities/blame.dart';
 import 'package:git_core/src/domain/entities/branch.dart';
 import 'package:git_core/src/domain/entities/commit.dart';
 import 'package:git_core/src/domain/entities/diff.dart';
@@ -247,6 +248,160 @@ final class Libgit2GitDataSource implements GitDataSource {
       return all.skip(cursor + 1).take(limit).map(_mapper.toCommit).toList();
     } finally {
       walker.free();
+    }
+  }
+
+  @override
+  Future<List<BlameLine>> blameFile({
+    required String path,
+    required String filePath,
+    GitOid? at,
+  }) async =>
+      _withRepository(path, (repository) => _blameOf(repository, filePath, at));
+
+  List<BlameLine> _blameOf(
+    libgit2.Repository repository,
+    String filePath,
+    GitOid? at,
+  ) {
+    final blame = libgit2.Blame.file(
+      repo: repository,
+      path: filePath,
+      newestCommit: at == null ? null : repository[at.value],
+    );
+    try {
+      final summaryByCommit = <String, String>{};
+      final lines = <BlameLine>[];
+      for (final hunk in blame) {
+        final committer = hunk.finalCommitter;
+        if (committer == null) {
+          continue;
+        }
+        final commitSha = hunk.finalCommitOid.sha;
+        final summary = summaryByCommit[commitSha] ??= _summaryOf(
+          repository: repository,
+          oid: hunk.finalCommitOid,
+        );
+        final author = _mapper.toSignature(committer);
+        for (var offset = 0; offset < hunk.linesCount; offset++) {
+          lines.add(
+            BlameLine(
+              line: hunk.finalStartLineNumber + offset,
+              commitOid: GitOid(commitSha),
+              summary: summary,
+              author: author,
+              isBoundary: hunk.isBoundary,
+            ),
+          );
+        }
+      }
+      return lines;
+    } finally {
+      blame.free();
+    }
+  }
+
+  String _summaryOf({
+    required libgit2.Repository repository,
+    required libgit2.Oid oid,
+  }) {
+    final commit = libgit2.Commit.lookup(repo: repository, oid: oid);
+    try {
+      return commit.summary;
+    } finally {
+      commit.free();
+    }
+  }
+
+  /// Upper bound on commits walked when looking for a file's history.
+  static const int _maxFileHistoryWalk = 2000;
+
+  @override
+  Future<List<Commit>> fileHistory({
+    required String path,
+    required String filePath,
+    int limit = 50,
+  }) async => _withRepository(
+    path,
+    (repository) => _fileHistoryOf(repository, filePath, limit),
+  );
+
+  // ponytail: follows only the current path; add rename tracking if users hit it.
+  List<Commit> _fileHistoryOf(
+    libgit2.Repository repository,
+    String filePath,
+    int limit,
+  ) {
+    if (limit <= 0 || repository.isBranchUnborn) {
+      return const [];
+    }
+
+    final walker = libgit2.RevWalk(repository);
+    try {
+      walker
+        ..sorting({libgit2.GitSort.time})
+        ..pushHead();
+      final walked = walker.walk(limit: _maxFileHistoryWalk);
+      try {
+        final history = <Commit>[];
+        for (final commit in walked) {
+          if (_commitTouchesPath(repository, commit, filePath)) {
+            history.add(_mapper.toCommit(commit));
+            if (history.length == limit) {
+              break;
+            }
+          }
+        }
+        return history;
+      } finally {
+        for (final commit in walked) {
+          commit.free();
+        }
+      }
+    } finally {
+      walker.free();
+    }
+  }
+
+  bool _commitTouchesPath(
+    libgit2.Repository repository,
+    libgit2.Commit commit,
+    String filePath,
+  ) {
+    libgit2.Tree? newTree;
+    libgit2.Tree? parentTree;
+    libgit2.Commit? parent;
+    try {
+      newTree = commit.tree;
+      final newOid = _pathOid(newTree, filePath);
+      if (commit.parents.isEmpty) {
+        return newOid != null;
+      }
+      parent = commit.parent(0);
+      parentTree = parent.tree;
+      return _pathOid(parentTree, filePath) != newOid;
+    } finally {
+      parentTree?.free();
+      newTree?.free();
+      parent?.free();
+    }
+  }
+
+  /// OID of [filePath] in [tree], or `null` when the path is absent.
+  String? _pathOid(libgit2.Tree tree, String filePath) {
+    final libgit2.TreeEntry entry;
+    try {
+      entry = tree[filePath];
+    } on Object {
+      return null;
+    }
+    try {
+      return entry.oid.sha;
+    } finally {
+      // Entries looked up by path own their native pointer; name lookups do not.
+      if (filePath.contains('/')) {
+        entry.free();
+      }
     }
   }
 
@@ -855,10 +1010,25 @@ final class Libgit2GitDataSource implements GitDataSource {
   @override
   Future<void> dispose({required String path}) async {}
 
+  /// Builds the flag set shared by the diff methods.
+  Set<libgit2.GitDiff> _diffFlags({
+    required bool ignoreWhitespace,
+    bool includeUntracked = false,
+  }) => {
+    if (includeUntracked) ...{
+      libgit2.GitDiff.includeUntracked,
+      libgit2.GitDiff.recurseUntrackedDirs,
+      libgit2.GitDiff.showUntrackedContent,
+    },
+    if (ignoreWhitespace) libgit2.GitDiff.ignoreWhitespaceChange,
+  };
+
   @override
   Future<DiffResult> diffCommit({
     required String path,
     required GitOid oid,
+    bool ignoreWhitespace = false,
+    int contextLines = 3,
   }) async => _withRepository(path, (repository) {
     final commit = libgit2.Commit.lookup(
       repo: repository,
@@ -877,6 +1047,8 @@ final class Libgit2GitDataSource implements GitDataSource {
         repo: repository,
         oldTree: oldTree,
         newTree: newTree,
+        flags: _diffFlags(ignoreWhitespace: ignoreWhitespace),
+        contextLines: contextLines,
       );
       try {
         if (diff.length > 0) {
@@ -898,6 +1070,8 @@ final class Libgit2GitDataSource implements GitDataSource {
   Future<DiffResult> diffWorkingTree({
     required String path,
     required bool staged,
+    bool ignoreWhitespace = false,
+    int contextLines = 3,
   }) async => _withRepository(path, (repository) {
     final index = repository.index;
     libgit2.Commit? head;
@@ -905,20 +1079,23 @@ final class Libgit2GitDataSource implements GitDataSource {
     try {
       head = _headCommit(repository);
       headTree = head?.tree;
+      final flags = _diffFlags(
+        ignoreWhitespace: ignoreWhitespace,
+        includeUntracked: !staged,
+      );
       final diff = staged
           ? libgit2.Diff.treeToIndex(
               repo: repository,
               tree: headTree,
               index: index,
+              flags: flags,
+              contextLines: contextLines,
             )
           : libgit2.Diff.indexToWorkdir(
               repo: repository,
               index: index,
-              flags: const {
-                libgit2.GitDiff.includeUntracked,
-                libgit2.GitDiff.recurseUntrackedDirs,
-                libgit2.GitDiff.showUntrackedContent,
-              },
+              flags: flags,
+              contextLines: contextLines,
             );
       try {
         if (staged && diff.length > 0) {

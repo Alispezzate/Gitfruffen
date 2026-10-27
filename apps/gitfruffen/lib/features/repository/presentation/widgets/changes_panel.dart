@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:git_core/git_core.dart';
 
 import 'package:gitfruffen/core/theme/app_colors.dart';
+import 'package:gitfruffen/features/repository/bloc/file_diff_state.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_event.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
@@ -15,7 +16,7 @@ class ChangesPanel extends StatefulWidget {
   const ChangesPanel({required this.tab, required this.onOpenFile, super.key});
 
   final RepositoryTab tab;
-  final ValueChanged<DiffFile> onOpenFile;
+  final ValueChanged<OpenFileRequest> onOpenFile;
 
   @override
   State<ChangesPanel> createState() => _ChangesPanelState();
@@ -147,7 +148,17 @@ class _ChangesPanelState extends State<ChangesPanel> {
       insertions: change.conflicted ? 0 : (diff?.insertions ?? 0),
       deletions: change.conflicted ? 0 : (diff?.deletions ?? 0),
       conflicted: change.conflicted,
-      onTap: diff == null ? null : () => widget.onOpenFile(diff),
+      onTap: diff == null
+          ? null
+          : () => widget.onOpenFile(
+              OpenFileRequest(
+                repositoryPath: widget.tab.repository.path,
+                file: diff,
+                source: staged
+                    ? FileDiffSource.staged
+                    : FileDiffSource.unstaged,
+              ),
+            ),
       trailing: change.conflicted
           ? null
           : _stageAction(context, change, staged: staged),

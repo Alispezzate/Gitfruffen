@@ -9,6 +9,7 @@ export 'src/data/datasources/git_credentials_data_source.dart';
 export 'src/data/datasources/git_data_source.dart';
 export 'src/data/datasources/libgit2_git_data_source.dart';
 export 'src/data/repositories/git_repository_impl.dart';
+export 'src/domain/entities/blame.dart';
 export 'src/domain/entities/branch.dart';
 export 'src/domain/entities/commit.dart';
 export 'src/domain/entities/diff.dart';

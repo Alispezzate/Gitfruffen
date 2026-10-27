@@ -306,6 +306,53 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diffNoChanges => 'Nessuna modifica';
 
   @override
+  String get diffBlame => 'Blame';
+
+  @override
+  String get diffHistory => 'Cronologia';
+
+  @override
+  String get diffPreviousChange => 'Modifica precedente';
+
+  @override
+  String get diffNextChange => 'Modifica successiva';
+
+  @override
+  String get diffHunkView => 'Vista hunk';
+
+  @override
+  String get diffInlineView => 'Vista inline';
+
+  @override
+  String get diffSplitView => 'Vista affiancata';
+
+  @override
+  String get diffIgnoreWhitespace => 'Ignora spazi bianchi';
+
+  @override
+  String get diffWordWrap => 'A capo automatico';
+
+  @override
+  String get diffHistoryTitle => 'Cronologia file';
+
+  @override
+  String get diffHistoryEmpty => 'Nessun commit ha modificato questo file.';
+
+  @override
+  String get diffHistoryLoading => 'Caricamento cronologia...';
+
+  @override
+  String get diffBlameLoading => 'Caricamento blame...';
+
+  @override
+  String get diffBlameUnavailable => 'Blame non disponibile';
+
+  @override
+  String diffUnchangedLines(int count) {
+    return '$count righe invariate';
+  }
+
+  @override
   String fileChangesSummary(int count) {
     return '$count file modificati';
   }

@@ -1,4 +1,5 @@
 import 'package:git_core/src/data/datasources/git_data_source.dart';
+import 'package:git_core/src/domain/entities/blame.dart';
 import 'package:git_core/src/domain/entities/branch.dart';
 import 'package:git_core/src/domain/entities/commit.dart';
 import 'package:git_core/src/domain/entities/diff.dart';
@@ -184,6 +185,37 @@ final class FakeGitDataSource implements GitDataSource {
     int limit = 100,
     GitOid? from,
   }) => log(path: path, limit: limit, from: from);
+
+  @override
+  Future<List<BlameLine>> blameFile({
+    required String path,
+    required String filePath,
+    GitOid? at,
+  }) async {
+    await Future<void>.delayed(latency);
+    final commit = _commit(60, _summaryOf(60), parents: _parentsOf(60));
+    final lineCount = (filePath.length % 3) + 1;
+    return [
+      for (var line = 1; line <= lineCount; line++)
+        BlameLine(
+          line: line,
+          commitOid: commit.oid,
+          summary: commit.summary,
+          author: commit.author,
+          isBoundary: line == 1,
+        ),
+    ];
+  }
+
+  @override
+  Future<List<Commit>> fileHistory({
+    required String path,
+    required String filePath,
+    int limit = 50,
+  }) async {
+    await Future<void>.delayed(latency);
+    return _history.take(limit < 5 ? limit : 5).toList();
+  }
 
   @override
   Future<List<Branch>> branches({required String path}) async {
@@ -405,6 +437,8 @@ final class FakeGitDataSource implements GitDataSource {
   Future<DiffResult> diffCommit({
     required String path,
     required GitOid oid,
+    bool ignoreWhitespace = false,
+    int contextLines = 3,
   }) async {
     await Future<void>.delayed(latency);
     return DiffResult(
@@ -477,6 +511,8 @@ final class FakeGitDataSource implements GitDataSource {
   Future<DiffResult> diffWorkingTree({
     required String path,
     required bool staged,
+    bool ignoreWhitespace = false,
+    int contextLines = 3,
   }) async {
     await Future<void>.delayed(latency);
     return staged ? _stagedDiff : _unstagedDiff;

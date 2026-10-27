@@ -4,6 +4,7 @@ import 'package:git_core/git_core.dart';
 
 import 'package:gitfruffen/core/theme/app_colors.dart';
 import 'package:gitfruffen/core/widgets/app_feedback.dart';
+import 'package:gitfruffen/features/repository/bloc/file_diff_state.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_bloc.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_event.dart';
 import 'package:gitfruffen/features/repository/bloc/repository_state.dart';
@@ -19,7 +20,7 @@ class CommitDetailsPanel extends StatefulWidget {
   });
 
   final RepositoryTab tab;
-  final ValueChanged<DiffFile> onOpenFile;
+  final ValueChanged<OpenFileRequest> onOpenFile;
 
   @override
   State<CommitDetailsPanel> createState() => _CommitDetailsPanelState();
@@ -123,7 +124,14 @@ class _CommitDetailsPanelState extends State<CommitDetailsPanel> {
                   type: file.changeType,
                   insertions: file.insertions,
                   deletions: file.deletions,
-                  onTap: () => widget.onOpenFile(file),
+                  onTap: () => widget.onOpenFile(
+                    OpenFileRequest(
+                      repositoryPath: tab.repository.path,
+                      file: file,
+                      source: FileDiffSource.commit,
+                      commitOid: oid,
+                    ),
+                  ),
                 ),
             ],
           ),

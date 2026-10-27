@@ -20,6 +20,18 @@ Replicate a modern Git desktop layout: menu, repository tabs, workspace header w
 - Path/Tree client-side; Tree groups by directory without collapse.
 - Amend commit supported; Compose with AI out of scope.
 
+### Advanced diff view
+- Hunk view shows changes only, in compact hunk cards with collapsed consecutive context lines.
+- Inline view is a unified diff of the whole file with old/new line numbers and hunk headers.
+- Split view pairs removed/added lines side by side for the whole file.
+- Full file is loaded by re-running the diff with a large context; Prev/Next navigate change blocks.
+- Blame is shown for the new side only, with author, short SHA and date; removed lines stay blank.
+- History lists commits touching the current path and loading an entry shows that commit's version of the file.
+- Ignore whitespace uses libgit2's `ignoreWhitespaceChange` flag.
+- Word wrap has a per-line horizontal-scroll fallback when disabled.
+- Revert Hunk and stage-hunk actions remain deferred.
+- History follows the current path only; rename tracking before the current path is a known limitation.
+
 ## Completed phases
 1. **git_core diff engine**: `DiffLine`, `DiffHunk`, `DiffFile`, `DiffResult` entities; `diffCommit` and `diffWorkingTree` methods; libgit2 mapping (tree-to-tree, tree-to-index, index-to-workdir), root commit against empty tree, untracked, rename, binary; deterministic fake datasource; tests.
 2. **RepositoryBloc**: `stagedDiff`, `unstagedDiff`, `selectedCommitOid`, `commitDiff`, `isLoadingCommitDiff`, `diffFailure`; `CommitSelected`, `CommitSelectionCleared` events; `CommitSubmitted(message, {amend})`; tests.
@@ -51,13 +63,13 @@ Removed:
 
 ## Verification
 - `fvm dart analyze apps/gitfruffen`: no issues.
-- `fvm flutter test` in `apps/gitfruffen`: 50 tests passed.
-- `fvm flutter test` in `packages/git_core`: 18 tests passed.
+- `fvm flutter test` in `apps/gitfruffen`: 72 tests passed.
+- `fvm flutter test` in `packages/git_core`: 22 tests passed.
 - `fvm dart format` and `fvm flutter gen-l10n` run.
 
 ## Deferred
 - Real terminal (pty/xterm).
-- File editor, Blame, History, Stage File from the file view.
+- File editor, Stage File from the file view, Revert Hunk.
 - Folder collapse in Tree mode.
 - Compose commits with AI.
 - Cloud Patches / Pull Requests / Issues / Teams sections.

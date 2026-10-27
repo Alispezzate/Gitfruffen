@@ -656,6 +656,96 @@ abstract class AppLocalizations {
   /// **'No changes'**
   String get diffNoChanges;
 
+  /// Toolbar toggle that shows blame authorship next to diff lines.
+  ///
+  /// In en, this message translates to:
+  /// **'Blame'**
+  String get diffBlame;
+
+  /// Toolbar action that opens the file history dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get diffHistory;
+
+  /// Tooltip of the action that jumps to the previous diff hunk.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous change'**
+  String get diffPreviousChange;
+
+  /// Tooltip of the action that jumps to the next diff hunk.
+  ///
+  /// In en, this message translates to:
+  /// **'Next change'**
+  String get diffNextChange;
+
+  /// Diff render mode that shows only changed lines.
+  ///
+  /// In en, this message translates to:
+  /// **'Hunk view'**
+  String get diffHunkView;
+
+  /// Diff render mode that shows a unified inline diff.
+  ///
+  /// In en, this message translates to:
+  /// **'Inline view'**
+  String get diffInlineView;
+
+  /// Diff render mode that shows old and new files side by side.
+  ///
+  /// In en, this message translates to:
+  /// **'Split view'**
+  String get diffSplitView;
+
+  /// Toolbar toggle that hides whitespace-only changes.
+  ///
+  /// In en, this message translates to:
+  /// **'Ignore whitespace'**
+  String get diffIgnoreWhitespace;
+
+  /// Toolbar toggle that wraps long diff lines.
+  ///
+  /// In en, this message translates to:
+  /// **'Word wrap'**
+  String get diffWordWrap;
+
+  /// Title of the dialog listing commits that changed the file.
+  ///
+  /// In en, this message translates to:
+  /// **'File history'**
+  String get diffHistoryTitle;
+
+  /// Empty state of the file history dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'No commits touch this file.'**
+  String get diffHistoryEmpty;
+
+  /// Loading label of the file history dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading history...'**
+  String get diffHistoryLoading;
+
+  /// Loading label shown while blame data is fetched.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading blame...'**
+  String get diffBlameLoading;
+
+  /// Shown when blame data could not be loaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Blame unavailable'**
+  String get diffBlameUnavailable;
+
+  /// Collapsed row summarising consecutive unchanged diff lines.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unchanged lines'**
+  String diffUnchangedLines(int count);
+
   /// Number of files changed by the selected commit.
   ///
   /// In en, this message translates to:

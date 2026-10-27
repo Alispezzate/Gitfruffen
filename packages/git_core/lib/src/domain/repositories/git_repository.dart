@@ -1,3 +1,4 @@
+import 'package:git_core/src/domain/entities/blame.dart';
 import 'package:git_core/src/domain/entities/branch.dart';
 import 'package:git_core/src/domain/entities/commit.dart';
 import 'package:git_core/src/domain/entities/diff.dart';
@@ -45,6 +46,23 @@ abstract interface class GitRepositoryContract {
     required String path,
     int limit = 100,
     GitOid? from,
+  });
+
+  /// Returns one blame entry per line of [filePath].
+  ///
+  /// When [at] is provided the file is blamed as of that commit, otherwise
+  /// HEAD is used.
+  Future<List<BlameLine>> blameFile({
+    required String path,
+    required String filePath,
+    GitOid? at,
+  });
+
+  /// Returns commits that changed [filePath], newest first.
+  Future<List<Commit>> fileHistory({
+    required String path,
+    required String filePath,
+    int limit = 50,
   });
 
   /// Returns all local and remote branches.
@@ -147,13 +165,20 @@ abstract interface class GitRepositoryContract {
 
   /// Returns the diff introduced by [oid] against its first parent.
   /// Root commits are diffed against the empty tree.
-  Future<DiffResult> diffCommit({required String path, required GitOid oid});
+  Future<DiffResult> diffCommit({
+    required String path,
+    required GitOid oid,
+    bool ignoreWhitespace = false,
+    int contextLines = 3,
+  });
 
   /// Returns staged (index vs HEAD) or unstaged (working tree vs index)
   /// differences.
   Future<DiffResult> diffWorkingTree({
     required String path,
     required bool staged,
+    bool ignoreWhitespace = false,
+    int contextLines = 3,
   });
 
   /// Releases any native resources associated with [path].

@@ -256,5 +256,104 @@ void main() {
         isNot(equals(unstaged.files.map((file) => file.path).toSet())),
       );
     });
+
+    test('accepts ignoreWhitespace while keeping the fake diffs', () async {
+      final dataSource = FakeGitDataSource(latency: Duration.zero);
+
+      final commit = await dataSource.diffCommit(
+        path: '/tmp/repo',
+        oid: const GitOid('a1b2c3d4e5f60718293a4b5c6d7e8f9012345678'),
+        ignoreWhitespace: true,
+      );
+      final workingTree = await dataSource.diffWorkingTree(
+        path: '/tmp/repo',
+        staged: false,
+        ignoreWhitespace: true,
+      );
+
+      expect(commit.files, hasLength(2));
+      expect(
+        workingTree.files.map((file) => file.path),
+        contains('lib/app.dart'),
+      );
+    });
+  });
+
+  group('FakeGitDataSource blame', () {
+    test('returns contiguous lines with an author and commit', () async {
+      final dataSource = FakeGitDataSource(latency: Duration.zero);
+      final lines = await dataSource.blameFile(
+        path: '/tmp/repo',
+        filePath: 'lib/main.dart',
+      );
+
+      expect(lines, isNotEmpty);
+      expect(
+        lines.map((line) => line.line),
+        List.generate(lines.length, (index) => index + 1),
+      );
+      expect(lines.every((line) => line.commitOid.value.isNotEmpty), isTrue);
+      expect(lines.every((line) => line.author.name.isNotEmpty), isTrue);
+    });
+  });
+
+  group('FakeGitDataSource fileHistory', () {
+    test(
+      'returns a deterministic non-empty subset and respects limit',
+      () async {
+        final dataSource = FakeGitDataSource(latency: Duration.zero);
+
+        final first = await dataSource.fileHistory(
+          path: '/tmp/repo',
+          filePath: 'lib/main.dart',
+        );
+        final second = await dataSource.fileHistory(
+          path: '/tmp/repo',
+          filePath: 'lib/main.dart',
+        );
+        final limited = await dataSource.fileHistory(
+          path: '/tmp/repo',
+          filePath: 'lib/main.dart',
+          limit: 2,
+        );
+
+        expect(first, isNotEmpty);
+        expect(first, second);
+        expect(limited, hasLength(2));
+      },
+    );
+  });
+
+  group('BlameLine', () {
+    test('is value-equal and exposes props in field order', () {
+      final author = Signature(
+        name: 'Ada Lovelace',
+        email: 'ada@gitfruffen.dev',
+        when: DateTime.utc(2026, 1, 1, 12),
+      );
+      final line = BlameLine(
+        line: 1,
+        commitOid: const GitOid('a1b2c3d4e5f60718293a4b5c6d7e8f9012345678'),
+        summary: 'Update docs',
+        author: author,
+        isBoundary: false,
+      );
+      final same = BlameLine(
+        line: 1,
+        commitOid: const GitOid('a1b2c3d4e5f60718293a4b5c6d7e8f9012345678'),
+        summary: 'Update docs',
+        author: author,
+        isBoundary: false,
+      );
+
+      expect(line, same);
+      expect(line.props, [
+        1,
+        const GitOid('a1b2c3d4e5f60718293a4b5c6d7e8f9012345678'),
+        'Update docs',
+        author,
+        false,
+      ]);
+    });
   });
 }
